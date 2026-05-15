@@ -1,0 +1,2515 @@
+{
+  "cute_dir": "/workspace/flash-attention/flash_attn/cute",
+  "cute_python_file_count": 47,
+  "cute_related_import_symbols": [
+    "Arch",
+    "AttentionMask",
+    "BaseDSL",
+    "BlackwellFusedMultiHeadAttentionBackward",
+    "BlackwellFusedMultiHeadAttentionBackwardDKDVKernel",
+    "BlackwellFusedMultiHeadAttentionBackwardDQKernel",
+    "BlackwellFusedMultiHeadAttentionForward",
+    "BlockInfo",
+    "BlockSparseTensors",
+    "BlockSparseTensorsTorch",
+    "Boolean",
+    "CUDA_VERSION",
+    "ClcDynamicPersistentTileScheduler",
+    "ClcDynamicPersistentTileSchedulerParams",
+    "ClcState",
+    "Constexpr",
+    "CpasyncGatherKVManager",
+    "DescaleTensors",
+    "FastDivmodDivisor",
+    "FlashAttentionBackwardPostprocess",
+    "FlashAttentionBackwardPreprocess",
+    "FlashAttentionBackwardSm100",
+    "FlashAttentionBackwardSm120",
+    "FlashAttentionBackwardSm80",
+    "FlashAttentionBackwardSm90",
+    "FlashAttentionForwardBase",
+    "FlashAttentionForwardCombine",
+    "FlashAttentionForwardSm100",
+    "FlashAttentionForwardSm120",
+    "FlashAttentionForwardSm80",
+    "FlashAttentionForwardSm90",
+    "FlashAttentionMLAForwardSm100",
+    "Float32",
+    "HardwareInfo",
+    "Int32",
+    "Int64",
+    "Int8",
+    "JitCompiledFunction",
+    "LayoutEnum",
+    "NamedBarrier",
+    "NamedBarrierBwd",
+    "NamedBarrierBwdSm100",
+    "NamedBarrierFwd",
+    "NamedBarrierFwdSm100",
+    "NamedBarrierFwdSm100_MLA2CTA",
+    "NumericMeta",
+    "PackGQA",
+    "PagedKVManager",
+    "ParamsBase",
+    "PipelineAsync",
+    "PipelineAsyncUmma",
+    "PipelineClcFetchAsync",
+    "PipelineCpAsync",
+    "PipelineState",
+    "PipelineTmaAsync",
+    "PipelineTmaUmma",
+    "PipelineUmmaAsync",
+    "PipelineUserType",
+    "SM100_TMEM_CAPACITY_COLUMNS",
+    "SchedulingMode",
+    "SeqlenInfo",
+    "SeqlenInfoQK",
+    "SeqlenInfoQKNewK",
+    "SingleTileLPTBwdScheduler",
+    "SingleTileLPTScheduler",
+    "SingleTileScheduler",
+    "SingleTileVarlenScheduler",
+    "Sm100FmhaClcDynamicTileScheduler",
+    "Sm100FmhaClcDynamicTileSchedulerParams",
+    "Sm100FmhaStaticTileScheduler",
+    "Sm100FmhaStaticTileSchedulerParams",
+    "Sm100FusedMask",
+    "Softmax",
+    "SoftmaxSm100",
+    "StaticPersistentTileScheduler",
+    "T",
+    "TileSchedulerArguments",
+    "TileSchedulerProtocol",
+    "Uint32",
+    "_TUNING_CONFIG",
+    "_flash_attn_fwd",
+    "ampere_helpers",
+    "apply_score_mod_bwd_inner",
+    "apply_score_mod_inner",
+    "assume_tensor_aligned",
+    "attention_ref",
+    "barrier",
+    "benchmark_forward",
+    "blackwell_helpers",
+    "clz",
+    "compute_sm100_fmha_grid",
+    "compute_sm100_fmha_grid_clc",
+    "const_expr",
+    "consume_block_sparse_loads",
+    "consume_block_sparse_mma_bwd_sm90",
+    "copy_utils",
+    "cpasync",
+    "cute",
+    "cute_dsl_ptxas",
+    "cutlass",
+    "cutlass_pipeline",
+    "dQaccum_store_block_sparse_bwd_sm90",
+    "dsl_user_op",
+    "dump_kernel_attributes",
+    "ex2_emulation_2",
+    "extract_mlir_values",
+    "fa_log",
+    "fa_logging",
+    "fa_printf",
+    "fa_sm100_utils",
+    "from_dlpack",
+    "gemm_ptx_w_idx",
+    "gemm_w_idx",
+    "get_aux_tensor_metadata",
+    "get_batch_from_cu_tensor",
+    "get_block_sparse_broadcast_pattern",
+    "get_block_sparse_iteration_info_bwd",
+    "get_broadcast_dims",
+    "get_curr_blocksparse_tensors",
+    "get_jit_cache",
+    "get_m_block_from_iter_bwd",
+    "get_sparse_q_block_size",
+    "get_total_block_count",
+    "get_total_q_block_count_bwd",
+    "handle_block_sparse_empty_tile_correction_sm100",
+    "hash_callable",
+    "if_generate",
+    "ir",
+    "is_fake_mode",
+    "llvm",
+    "make_packgqa_tiled_tma_atom",
+    "make_sm100_thread_cooperative_group",
+    "min",
+    "mma_sm100_desc",
+    "new_from_mlir_values",
+    "normalize_block_sparse_config",
+    "normalize_block_sparse_config_bwd",
+    "nvvm",
+    "pack_gqa_layout",
+    "pipeline",
+    "pipeline_custom",
+    "pipeline_init_arrive",
+    "pipeline_init_wait",
+    "produce_block_sparse_loads",
+    "produce_block_sparse_loads_sm100",
+    "produce_block_sparse_q_loads_bwd_sm100",
+    "produce_block_sparse_q_loads_bwd_sm90",
+    "scalar_to_ssa",
+    "sm100_desc",
+    "sm100_utils",
+    "sm100_utils_basic",
+    "sm90_utils_basic",
+    "smid",
+    "softmax_block_sparse_sm100",
+    "ssa_to_scalar",
+    "tcgen05",
+    "to_cute_aux_tensor",
+    "to_cute_block_sparse_tensors",
+    "to_cute_tensor",
+    "utils",
+    "utils_basic",
+    "warp",
+    "warp_reduce",
+    "warpgroup"
+  ],
+  "git_head": "0409f9adcbdebff6cc19eb95f370d40e896980bc",
+  "git_status_short": "?? stage0_harness_result.json",
+  "hip_visible_devices": "0",
+  "primitive_occurrence_count": 7902,
+  "primitive_unique_count": 220,
+  "primitives": {
+    "AddressSpace": {
+      "count": 12,
+      "files": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/topk_gather_kv.py"
+      ]
+    },
+    "Boolean": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/paged_kv.py"
+      ]
+    },
+    "ComposedLayout": {
+      "count": 75,
+      "files": [
+        "flash_attn/cute/ampere_helpers.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "Coord": {
+      "count": 27,
+      "files": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/tile_scheduler.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "CopyAtom": {
+      "count": 114,
+      "files": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "Int32": {
+      "count": 72,
+      "files": [
+        "flash_attn/cute/flash_fwd_sm100.py"
+      ]
+    },
+    "Layout": {
+      "count": 44,
+      "files": [
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/mma_sm100_desc.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/tile_scheduler.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "Numeric": {
+      "count": 9,
+      "files": [
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "Pointer": {
+      "count": 43,
+      "files": [
+        "flash_attn/cute/barrier.py",
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/mma_sm100_desc.py",
+        "flash_attn/cute/tile_scheduler.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "ReductionOp": {
+      "count": 5,
+      "files": [
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "Shape": {
+      "count": 42,
+      "files": [
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/tile_scheduler.py"
+      ]
+    },
+    "Swizzle": {
+      "count": 7,
+      "files": [
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/mma_sm100_desc.py"
+      ]
+    },
+    "Tensor": {
+      "count": 945,
+      "files": [
+        "flash_attn/cute/ampere_helpers.py",
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/block_sparse_utils.py",
+        "flash_attn/cute/block_sparsity.py",
+        "flash_attn/cute/compute_block_sparsity.py",
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/mma_sm100_desc.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/seqlen_info.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/softmax.py",
+        "flash_attn/cute/tile_scheduler.py",
+        "flash_attn/cute/topk_gather_kv.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "TensorSSA": {
+      "count": 12,
+      "files": [
+        "flash_attn/cute/softmax.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "ThrMma": {
+      "count": 4,
+      "files": [
+        "flash_attn/cute/flash_fwd_mla_sm100.py"
+      ]
+    },
+    "Tile": {
+      "count": 3,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "TiledCopy": {
+      "count": 69,
+      "files": [
+        "flash_attn/cute/ampere_helpers.py",
+        "flash_attn/cute/block_sparse_utils.py",
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/topk_gather_kv.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "TiledMma": {
+      "count": 69,
+      "files": [
+        "flash_attn/cute/ampere_helpers.py",
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "Uint8": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py"
+      ]
+    },
+    "append": {
+      "count": 17,
+      "files": [
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "arch": {
+      "count": 783,
+      "files": [
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/block_sparse_utils.py",
+        "flash_attn/cute/compute_block_sparsity.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/pipeline.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/softmax.py",
+        "flash_attn/cute/tile_scheduler.py",
+        "flash_attn/cute/topk_gather_kv.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "assume": {
+      "count": 42,
+      "files": [
+        "flash_attn/cute/cute_dsl_utils.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/seqlen_info.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "atom": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/pack_gqa.py"
+      ]
+    },
+    "autovec_copy": {
+      "count": 29,
+      "files": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "benchmark": {
+      "count": 3,
+      "files": [
+        "flash_attn/cute/benchmark_flash_attention_fp8.py"
+      ]
+    },
+    "benchmark_flash_attention_fp8": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/benchmark_flash_attention_fp8.py"
+      ]
+    },
+    "blackwell_helpers": {
+      "count": 4,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py"
+      ]
+    },
+    "block_info": {
+      "count": 98,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mask.py"
+      ]
+    },
+    "block_sparse_utils": {
+      "count": 6,
+      "files": [
+        "flash_attn/cute/compute_block_sparsity.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py"
+      ]
+    },
+    "block_sparsity": {
+      "count": 10,
+      "files": [
+        "flash_attn/cute/block_sparse_utils.py",
+        "flash_attn/cute/compute_block_sparsity.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "cache_utils": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "ceil_div": {
+      "count": 61,
+      "files": [
+        "flash_attn/cute/block_info.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/tile_scheduler.py"
+      ]
+    },
+    "coalesce": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "compile": {
+      "count": 16,
+      "files": [
+        "flash_attn/cute/compute_block_sparsity.py",
+        "flash_attn/cute/cute_dsl_utils.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/interface.py",
+        "flash_attn/cute/testing.py"
+      ]
+    },
+    "composition": {
+      "count": 34,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/topk_gather_kv.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "copy": {
+      "count": 251,
+      "files": [
+        "flash_attn/cute/ampere_helpers.py",
+        "flash_attn/cute/block_sparse_utils.py",
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/topk_gather_kv.py"
+      ]
+    },
+    "core": {
+      "count": 29,
+      "files": [
+        "flash_attn/cute/block_sparse_utils.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "cosize": {
+      "count": 59,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "crd2idx": {
+      "count": 15,
+      "files": [
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "cute_dsl_utils": {
+      "count": 18,
+      "files": [
+        "flash_attn/cute/block_sparsity.py",
+        "flash_attn/cute/compute_block_sparsity.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "dice": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "domain_offset": {
+      "count": 75,
+      "files": [
+        "flash_attn/cute/block_sparse_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/seqlen_info.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "elem_less": {
+      "count": 20,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "fa_logging": {
+      "count": 3,
+      "files": [
+        "flash_attn/cute/cache_utils.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py"
+      ]
+    },
+    "fast_math": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/tile_scheduler.py"
+      ]
+    },
+    "filter": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "filter_zeros": {
+      "count": 4,
+      "files": [
+        "flash_attn/cute/copy_utils.py"
+      ]
+    },
+    "flash_bwd": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm120.py",
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "flash_bwd_postprocess": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "flash_bwd_preprocess": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "flash_bwd_sm100": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "flash_bwd_sm120": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "flash_bwd_sm90": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "flash_fwd": {
+      "count": 4,
+      "files": [
+        "flash_attn/cute/flash_fwd_sm120.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "flash_fwd_combine": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "flash_fwd_mla_sm100": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "flash_fwd_sm100": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/interface.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "flash_fwd_sm120": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "flash_fwd_sm90": {
+      "count": 3,
+      "files": [
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "flat_divide": {
+      "count": 36,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "gemm": {
+      "count": 74,
+      "files": [
+        "flash_attn/cute/ampere_helpers.py",
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "get": {
+      "count": 24,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py"
+      ]
+    },
+    "group_modes": {
+      "count": 63,
+      "files": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/seqlen_info.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "idx2crd": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm90.py"
+      ]
+    },
+    "interface": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/benchmark_flash_attention_fp8.py"
+      ]
+    },
+    "is_congruent": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/mma_sm100_desc.py"
+      ]
+    },
+    "is_static": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "jit": {
+      "count": 225,
+      "files": [
+        "flash_attn/cute/ampere_helpers.py",
+        "flash_attn/cute/barrier.py",
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/block_info.py",
+        "flash_attn/cute/block_sparse_utils.py",
+        "flash_attn/cute/compute_block_sparsity.py",
+        "flash_attn/cute/fast_math.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/softmax.py",
+        "flash_attn/cute/tile_scheduler.py",
+        "flash_attn/cute/topk_gather_kv.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "kernel": {
+      "count": 104,
+      "files": [
+        "flash_attn/cute/compute_block_sparsity.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "left_inverse": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "local_tile": {
+      "count": 92,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py"
+      ]
+    },
+    "logical_divide": {
+      "count": 20,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/mma_sm100_desc.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/softmax.py"
+      ]
+    },
+    "make_and_init_compute_mma_P_pipeline": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "make_and_init_compute_mma_dS_pipeline": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "make_and_init_load_compute_LSE_pipeline": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "make_and_init_load_compute_sum_OdO_pipeline": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "make_and_init_load_mma_K_pipeline": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "make_and_init_load_mma_QT_pipeline": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "make_and_init_load_mma_Q_pipeline": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "make_and_init_load_mma_V_pipeline": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "make_and_init_load_mma_dO_pipeline": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "make_and_init_mma_compute_S_pipeline": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "make_and_init_mma_compute_dKdV_pipeline": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "make_and_init_mma_compute_dP_pipeline": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "make_composed_layout": {
+      "count": 4,
+      "files": [
+        "flash_attn/cute/ampere_helpers.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_sm100.py"
+      ]
+    },
+    "make_consumer": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py"
+      ]
+    },
+    "make_copy_atom": {
+      "count": 67,
+      "files": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/topk_gather_kv.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "make_cotiled_copy": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "make_fake_bwd_tensors": {
+      "count": 3,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "make_fake_stream": {
+      "count": 5,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "make_fake_tensor": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "make_fn": {
+      "count": 9,
+      "files": [
+        "flash_attn/cute/flash_fwd_mla_sm100.py"
+      ]
+    },
+    "make_fragment": {
+      "count": 43,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/softmax.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "make_fragment_A": {
+      "count": 27,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "make_fragment_B": {
+      "count": 22,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "make_fragment_C": {
+      "count": 21,
+      "files": [
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "make_fragment_like": {
+      "count": 32,
+      "files": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/softmax.py",
+        "flash_attn/cute/topk_gather_kv.py"
+      ]
+    },
+    "make_identity_tensor": {
+      "count": 65,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/topk_gather_kv.py"
+      ]
+    },
+    "make_instr_desc": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/mma_sm100_desc.py"
+      ]
+    },
+    "make_layout": {
+      "count": 216,
+      "files": [
+        "flash_attn/cute/compute_block_sparsity.py",
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/cute_dsl_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/softmax.py",
+        "flash_attn/cute/tile_scheduler.py",
+        "flash_attn/cute/topk_gather_kv.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "make_mma_atom": {
+      "count": 3,
+      "files": [
+        "flash_attn/cute/blackwell_helpers.py"
+      ]
+    },
+    "make_ordered_layout": {
+      "count": 22,
+      "files": [
+        "flash_attn/cute/ampere_helpers.py",
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/topk_gather_kv.py"
+      ]
+    },
+    "make_packgqa_tiled_tma_atom": {
+      "count": 5,
+      "files": [
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/pack_gqa.py"
+      ]
+    },
+    "make_participants": {
+      "count": 31,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "make_pipeline": {
+      "count": 19,
+      "files": [
+        "flash_attn/cute/flash_fwd_mla_sm100.py"
+      ]
+    },
+    "make_pipeline_state": {
+      "count": 73,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/pipeline.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "make_ptr": {
+      "count": 11,
+      "files": [
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/topk_gather_kv.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "make_rmem_tensor": {
+      "count": 50,
+      "files": [
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/softmax.py",
+        "flash_attn/cute/topk_gather_kv.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "make_rmem_tensor_like": {
+      "count": 15,
+      "files": [
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "make_sm100_thread_cooperative_group": {
+      "count": 4,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/tile_scheduler.py"
+      ]
+    },
+    "make_smem_desc_base": {
+      "count": 10,
+      "files": [
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/mma_sm100_desc.py"
+      ]
+    },
+    "make_smem_desc_start_addr": {
+      "count": 14,
+      "files": [
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/mma_sm100_desc.py"
+      ]
+    },
+    "make_smem_layout": {
+      "count": 7,
+      "files": [
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd_sm90.py"
+      ]
+    },
+    "make_smem_layout_a": {
+      "count": 22,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "make_smem_layout_atom": {
+      "count": 4,
+      "files": [
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "make_smem_layout_b": {
+      "count": 19,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "make_smem_layout_epi": {
+      "count": 9,
+      "files": [
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py"
+      ]
+    },
+    "make_swizzle": {
+      "count": 4,
+      "files": [
+        "flash_attn/cute/ampere_helpers.py",
+        "flash_attn/cute/flash_fwd_combine.py"
+      ]
+    },
+    "make_tensor": {
+      "count": 171,
+      "files": [
+        "flash_attn/cute/cute_dsl_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/topk_gather_kv.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "make_thread_cooperative_group": {
+      "count": 65,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "make_tiled_copy": {
+      "count": 5,
+      "files": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "make_tiled_copy_A": {
+      "count": 7,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "make_tiled_copy_B": {
+      "count": 8,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "make_tiled_copy_C": {
+      "count": 5,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_sm90.py"
+      ]
+    },
+    "make_tiled_copy_D": {
+      "count": 4,
+      "files": [
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py"
+      ]
+    },
+    "make_tiled_copy_tv": {
+      "count": 26,
+      "files": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/topk_gather_kv.py"
+      ]
+    },
+    "make_tiled_mma": {
+      "count": 6,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_fwd.py"
+      ]
+    },
+    "make_tiled_tma_atom": {
+      "count": 17,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py"
+      ]
+    },
+    "make_tiled_tma_atom_A": {
+      "count": 9,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "make_tiled_tma_atom_B": {
+      "count": 17,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "make_tiled_tma_atom_fn": {
+      "count": 5,
+      "files": [
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py"
+      ]
+    },
+    "make_tma": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/flash_fwd_mla_sm100.py"
+      ]
+    },
+    "make_tmem_copy": {
+      "count": 32,
+      "files": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "make_trivial_tiled_mma": {
+      "count": 25,
+      "files": [
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "make_warp_uniform": {
+      "count": 67,
+      "files": [
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/block_sparse_utils.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "mask": {
+      "count": 32,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "math": {
+      "count": 108,
+      "files": [
+        "flash_attn/cute/block_sparse_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/softmax.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "mma_sm100_desc": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/blackwell_helpers.py"
+      ]
+    },
+    "named_barrier": {
+      "count": 7,
+      "files": [
+        "flash_attn/cute/block_sparse_utils.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py"
+      ]
+    },
+    "nvgpu": {
+      "count": 117,
+      "files": [
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mma_sm100_desc.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/topk_gather_kv.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "pack_gqa": {
+      "count": 98,
+      "files": [
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py"
+      ]
+    },
+    "paged_kv": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py"
+      ]
+    },
+    "partition_A": {
+      "count": 13,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "partition_B": {
+      "count": 25,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "partition_C": {
+      "count": 45,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "partition_D": {
+      "count": 95,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/topk_gather_kv.py"
+      ]
+    },
+    "partition_D_position_independent": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_sm100.py"
+      ]
+    },
+    "partition_S": {
+      "count": 109,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/topk_gather_kv.py"
+      ]
+    },
+    "partition_fragment_ABC": {
+      "count": 7,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd_sm90.py"
+      ]
+    },
+    "partition_shape_A": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "partition_shape_C": {
+      "count": 27,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "partitioning": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py"
+      ]
+    },
+    "partitions": {
+      "count": 3,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_sm90.py"
+      ]
+    },
+    "pipeline": {
+      "count": 50,
+      "files": [
+        "flash_attn/cute/flash_fwd_sm100.py"
+      ]
+    },
+    "print_tensor": {
+      "count": 13,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py"
+      ]
+    },
+    "printf": {
+      "count": 28,
+      "files": [
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/fa_logging.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/tile_scheduler.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "product_each": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "rank": {
+      "count": 39,
+      "files": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/seqlen_info.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "recast_layout": {
+      "count": 14,
+      "files": [
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/mma_sm100_desc.py"
+      ]
+    },
+    "recast_ptr": {
+      "count": 31,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "recast_tensor": {
+      "count": 5,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "round_up": {
+      "count": 20,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/tile_scheduler.py"
+      ]
+    },
+    "runtime": {
+      "count": 14,
+      "files": [
+        "flash_attn/cute/cache_utils.py",
+        "flash_attn/cute/cute_dsl_utils.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/interface.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "select": {
+      "count": 146,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "seqlen_info": {
+      "count": 107,
+      "files": [
+        "flash_attn/cute/block_info.py",
+        "flash_attn/cute/block_sparse_utils.py",
+        "flash_attn/cute/compute_block_sparsity.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/softmax.py"
+      ]
+    },
+    "shape": {
+      "count": 28,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm90.py"
+      ]
+    },
+    "size": {
+      "count": 465,
+      "files": [
+        "flash_attn/cute/ampere_helpers.py",
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/mma_sm100_desc.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/softmax.py",
+        "flash_attn/cute/tile_scheduler.py",
+        "flash_attn/cute/topk_gather_kv.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "size_in_bytes": {
+      "count": 32,
+      "files": [
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "slice_": {
+      "count": 18,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "sm100_hd256_2cta_fmha_backward": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "sm100_hd256_2cta_fmha_backward_dkdvkernel": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward.py"
+      ]
+    },
+    "sm100_hd256_2cta_fmha_backward_dqkernel": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward.py"
+      ]
+    },
+    "sm100_hd256_2cta_fmha_forward": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "softmax": {
+      "count": 109,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py"
+      ]
+    },
+    "struct": {
+      "count": 204,
+      "files": [
+        "flash_attn/cute/compute_block_sparsity.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "sym_int": {
+      "count": 6,
+      "files": [
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "testing": {
+      "count": 3,
+      "files": [
+        "flash_attn/cute/compute_block_sparsity.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/interface.py"
+      ]
+    },
+    "tile_scheduler": {
+      "count": 153,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "tile_to_shape": {
+      "count": 12,
+      "files": [
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_combine.py"
+      ]
+    },
+    "tiled_copy_1d": {
+      "count": 7,
+      "files": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py"
+      ]
+    },
+    "tiled_copy_2d": {
+      "count": 6,
+      "files": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_preprocess.py",
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py"
+      ]
+    },
+    "tiled_copy_O_r2g": {
+      "count": 6,
+      "files": [
+        "flash_attn/cute/flash_fwd_mla_sm100.py"
+      ]
+    },
+    "tiled_copy_accum": {
+      "count": 3,
+      "files": [
+        "flash_attn/cute/flash_bwd_postprocess.py"
+      ]
+    },
+    "tiled_copy_dKVaccum_r2s": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm90.py"
+      ]
+    },
+    "tiled_copy_r2s_dKV": {
+      "count": 7,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py"
+      ]
+    },
+    "tiled_copy_r2s_dQ": {
+      "count": 4,
+      "files": [
+        "flash_attn/cute/flash_bwd_postprocess.py"
+      ]
+    },
+    "tiled_copy_t2r": {
+      "count": 5,
+      "files": [
+        "flash_attn/cute/flash_bwd_postprocess.py"
+      ]
+    },
+    "tiled_divide": {
+      "count": 20,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_fwd_combine.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/paged_kv.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/topk_gather_kv.py"
+      ]
+    },
+    "tiled_gmem_store_dK": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py"
+      ]
+    },
+    "tiled_gmem_store_dV": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py"
+      ]
+    },
+    "tiled_mma": {
+      "count": 56,
+      "files": [
+        "flash_attn/cute/ampere_helpers.py",
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/flash_bwd.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "tiled_mma_PVti": {
+      "count": 14,
+      "files": [
+        "flash_attn/cute/flash_fwd_mla_sm100.py"
+      ]
+    },
+    "tiled_mma_QK": {
+      "count": 17,
+      "files": [
+        "flash_attn/cute/flash_fwd_mla_sm100.py"
+      ]
+    },
+    "tiled_mma_QviVi": {
+      "count": 17,
+      "files": [
+        "flash_attn/cute/flash_fwd_mla_sm100.py"
+      ]
+    },
+    "tiled_mma_S": {
+      "count": 19,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py"
+      ]
+    },
+    "tiled_mma_SdP": {
+      "count": 14,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm90.py"
+      ]
+    },
+    "tiled_mma_dK": {
+      "count": 31,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py"
+      ]
+    },
+    "tiled_mma_dP": {
+      "count": 16,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py"
+      ]
+    },
+    "tiled_mma_dQ": {
+      "count": 25,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py"
+      ]
+    },
+    "tiled_mma_dV": {
+      "count": 30,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/flash_bwd_sm90.py"
+      ]
+    },
+    "tiled_mma_dkv": {
+      "count": 9,
+      "files": [
+        "flash_attn/cute/flash_bwd.py"
+      ]
+    },
+    "tiled_mma_dq": {
+      "count": 8,
+      "files": [
+        "flash_attn/cute/flash_bwd.py"
+      ]
+    },
+    "tiled_mma_pv": {
+      "count": 32,
+      "files": [
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py"
+      ]
+    },
+    "tiled_mma_qk": {
+      "count": 40,
+      "files": [
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/flash_fwd_sm90.py"
+      ]
+    },
+    "tiled_mma_sdp": {
+      "count": 9,
+      "files": [
+        "flash_attn/cute/flash_bwd.py"
+      ]
+    },
+    "tiled_smem_store": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/flash_fwd_sm100.py"
+      ]
+    },
+    "tiled_t2r": {
+      "count": 4,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "tiled_t2r_dK": {
+      "count": 3,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "tiled_t2r_dV": {
+      "count": 3,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py"
+      ]
+    },
+    "tiled_tmem_ld": {
+      "count": 5,
+      "files": [
+        "flash_attn/cute/flash_bwd_postprocess.py"
+      ]
+    },
+    "tiled_tmem_ld_dK": {
+      "count": 5,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py"
+      ]
+    },
+    "tiled_tmem_ld_dV": {
+      "count": 4,
+      "files": [
+        "flash_attn/cute/flash_bwd_sm100.py"
+      ]
+    },
+    "tiled_tmem_load": {
+      "count": 12,
+      "files": [
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "tiled_tmem_load_stats": {
+      "count": 3,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "tiled_tmem_load_vec": {
+      "count": 2,
+      "files": [
+        "flash_attn/cute/flash_fwd_sm100.py"
+      ]
+    },
+    "tiled_tmem_store_stats": {
+      "count": 3,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    },
+    "topk_gather_kv": {
+      "count": 1,
+      "files": [
+        "flash_attn/cute/flash_fwd_mla_sm100.py"
+      ]
+    },
+    "typing": {
+      "count": 11,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dkdvkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/tile_scheduler.py",
+        "flash_attn/cute/utils.py"
+      ]
+    },
+    "utils": {
+      "count": 105,
+      "files": [
+        "flash_attn/cute/compute_block_sparsity.py",
+        "flash_attn/cute/flash_fwd_mla_sm100.py",
+        "flash_attn/cute/flash_fwd_sm100.py",
+        "flash_attn/cute/mask.py",
+        "flash_attn/cute/pack_gqa.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py",
+        "flash_attn/cute/softmax.py",
+        "flash_attn/cute/tile_scheduler.py",
+        "flash_attn/cute/topk_gather_kv.py"
+      ]
+    },
+    "zipped_divide": {
+      "count": 9,
+      "files": [
+        "flash_attn/cute/sm100_hd256_2cta_fmha_backward_dqkernel.py",
+        "flash_attn/cute/sm100_hd256_2cta_fmha_forward.py"
+      ]
+    }
+  },
+  "repo": "/workspace/flash-attention",
+  "rocm_smi_product": "============================ ROCm System Management Interface ============================\nWARNING: AMD GPU device(s) is/are in a low-power state. Check power control/runtime_status\n\n====================================== Product Info ======================================\nGPU[0]\t\t: Card Series: \t\tAMD Instinct MI355X\nGPU[0]\t\t: Card Model: \t\t0x75a3\nGPU[0]\t\t: Card Vendor: \t\tAdvanced Micro Devices, Inc. [AMD/ATI]\nGPU[0]\t\t: Card SKU: \t\tN/A\nGPU[0]\t\t: Subsystem ID: \t0x75a3\nGPU[0]\t\t: Device Rev: \t\t0x00\nGPU[0]\t\t: Node ID: \t\t2\nGPU[0]\t\t: GUID: \t\t42583\nGPU[0]\t\t: GFX Version: \t\tgfx950\nGPU[1]\t\t: Card Series: \t\tAMD Instinct MI355X\nGPU[1]\t\t: Card Model: \t\t0x75a3\nGPU[1]\t\t: Card Vendor: \t\tAdvanced Micro Devices, Inc. [AMD/ATI]\nGPU[1]\t\t: Card SKU: \t\tN/A\nGPU[1]\t\t: Subsystem ID: \t0x75a3\nGPU[1]\t\t: Device Rev: \t\t0x00\nGPU[1]\t\t: Node ID: \t\t3\nGPU[1]\t\t: GUID: \t\t27226\nGPU[1]\t\t: GFX Version: \t\tgfx950\nGPU[2]\t\t: Card Series: \t\tAMD Instinct MI355X\nGPU[2]\t\t: Card Model: \t\t0x75a3\nGPU[2]\t\t: Card Vendor: \t\tAdvanced Micro Devices, Inc. [AMD/ATI]\nGPU[2]\t\t: Card SKU: \t\tN/A\nGPU[2]\t\t: Subsystem ID: \t0x75a3\nGPU[2]\t\t: Device Rev: \t\t0x00\nGPU[2]\t\t: Node ID: \t\t4\nGPU[2]\t\t: GUID: \t\t36479\nGPU[2]\t\t: GFX Version: \t\tgfx950\nGPU[3]\t\t: Card Series: \t\tAMD Instinct MI355X\nGPU[3]\t\t: Card Model: \t\t0x75a3\nGPU[3]\t\t: Card Vendor: \t\tAdvanced Micro Devices, Inc. [AMD/ATI]\nGPU[3]\t\t: Card SKU: \t\tN/A\nGPU[3]\t\t: Subsystem ID: \t0x75a3\nGPU[3]\t\t: Device Rev: \t\t0x00\nGPU[3]\t\t: Node ID: \t\t5\nGPU[3]\t\t: GUID: \t\t17010\nGPU[3]\t\t: GFX Version: \t\tgfx950\nGPU[4]\t\t: Card Series: \t\tAMD Instinct MI355X\nGPU[4]\t\t: Card Model: \t\t0x75a3\nGPU[4]\t\t: Card Vendor: \t\tAdvanced Micro Devices, Inc. [AMD/ATI]\nGPU[4]\t\t: Card SKU: \t\tN/A\nGPU[4]\t\t: Subsystem ID: \t0x75a3\nGPU[4]\t\t: Device Rev: \t\t0x00\nGPU[4]\t\t: Node ID: \t\t6\nGPU[4]\t\t: GUID: \t\t1590\nGPU[4]\t\t: GFX Version: \t\tgfx950\nGPU[5]\t\t: Card Series: \t\tAMD Instinct MI355X\nGPU[5]\t\t: Card Model: \t\t0x75a3\nGPU[5]\t\t: Card Vendor: \t\tAdvanced Micro Devices, Inc. [AMD/ATI]\nGPU[5]\t\t: Card SKU: \t\tN/A\nGPU[5]\t\t: Subsystem ID: \t0x75a3\nGPU[5]\t\t: Device Rev: \t\t0x00\nGPU[5]\t\t: Node ID: \t\t7\nGPU[5]\t\t: GUID: \t\t51771\nGPU[5]\t\t: GFX Version: \t\tgfx950\nGPU[6]\t\t: Card Series: \t\tAMD Instinct MI355X\nGPU[6]\t\t: Card Model: \t\t0x75a3\nGPU[6]\t\t: Card Vendor: \t\tAdvanced Micro Devices, Inc. [AMD/ATI]\nGPU[6]\t\t: Card SKU: \t\tN/A\nGPU[6]\t\t: Subsystem ID: \t0x75a3\nGPU[6]\t\t: Device Rev: \t\t0x00\nGPU[6]\t\t: Node ID: \t\t8\nGPU[6]\t\t: GUID: \t\t11806\nGPU[6]\t\t: GFX Version: \t\tgfx950\nGPU[7]\t\t: Card Series: \t\tAMD Instinct MI355X\nGPU[7]\t\t: Card Model: \t\t0x75a3\nGPU[7]\t\t: Card Vendor: \t\tAdvanced Micro Devices, Inc. [AMD/ATI]\nGPU[7]\t\t: Card SKU: \t\tN/A\nGPU[7]\t\t: Subsystem ID: \t0x75a3\nGPU[7]\t\t: Device Rev: \t\t0x00\nGPU[7]\t\t: Node ID: \t\t9\nGPU[7]\t\t: GUID: \t\t57875\nGPU[7]\t\t: GFX Version: \t\tgfx950\n==========================================================================================\n================================== End of ROCm SMI Log ===================================",
+  "status": "ok",
+  "tilelang_importable": true,
+  "top_primitives": [
+    [
+      "Tensor",
+      945
+    ],
+    [
+      "arch",
+      783
+    ],
+    [
+      "size",
+      465
+    ],
+    [
+      "copy",
+      251
+    ],
+    [
+      "jit",
+      225
+    ],
+    [
+      "make_layout",
+      216
+    ],
+    [
+      "struct",
+      204
+    ],
+    [
+      "make_tensor",
+      171
+    ],
+    [
+      "tile_scheduler",
+      153
+    ],
+    [
+      "select",
+      146
+    ],
+    [
+      "nvgpu",
+      117
+    ],
+    [
+      "CopyAtom",
+      114
+    ],
+    [
+      "partition_S",
+      109
+    ],
+    [
+      "softmax",
+      109
+    ],
+    [
+      "math",
+      108
+    ],
+    [
+      "seqlen_info",
+      107
+    ],
+    [
+      "utils",
+      105
+    ],
+    [
+      "kernel",
+      104
+    ],
+    [
+      "block_info",
+      98
+    ],
+    [
+      "pack_gqa",
+      98
+    ],
+    [
+      "partition_D",
+      95
+    ],
+    [
+      "local_tile",
+      92
+    ],
+    [
+      "ComposedLayout",
+      75
+    ],
+    [
+      "domain_offset",
+      75
+    ],
+    [
+      "gemm",
+      74
+    ],
+    [
+      "make_pipeline_state",
+      73
+    ],
+    [
+      "Int32",
+      72
+    ],
+    [
+      "TiledCopy",
+      69
+    ],
+    [
+      "TiledMma",
+      69
+    ],
+    [
+      "make_copy_atom",
+      67
+    ]
+  ],
+  "torch_importable": true
+}
