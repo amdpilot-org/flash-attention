@@ -9,15 +9,24 @@ import warnings
 
 
 USE_TRITON_ROCM = os.getenv("FLASH_ATTENTION_TRITON_AMD_ENABLE", "FALSE") == "TRUE"
-if not USE_TRITON_ROCM and getattr(torch.version, 'hip', None) is not None:
+USE_AMD_FA3 = os.getenv("FLASH_ATTENTION_AMD_FA3", "FALSE") == "TRUE"
+is_rocm = getattr(torch.version, 'hip', None) is not None
+
+if USE_AMD_FA3 and is_rocm:
+    # Native AMD FA3 path (gfx950 MI355X MFMA/global_load_lds via aiter)
+    import flash_attn_3._C  # noqa: verifies native backend presence
+    from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_3 as flash_attn_3_gpu
+elif USE_TRITON_ROCM:
+    from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_3 as flash_attn_3_gpu
+elif is_rocm:
     try:
         import flash_attn_3._C
     except ImportError:
         warnings.warn("flash_attn_3._C (which has ROCm/HIP kernels) not found, falling back to Triton implementation")
         USE_TRITON_ROCM = True
-
-if USE_TRITON_ROCM:
-    from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_3 as flash_attn_3_gpu
+        from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_3 as flash_attn_3_gpu
+    else:
+        flash_attn_3_gpu = torch.ops.flash_attn_3
 else:
     # isort: off
     # We need to import the CUDA kernels after importing torch
