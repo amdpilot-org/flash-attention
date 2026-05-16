@@ -158,7 +158,7 @@ struct CollectiveMainloopFwdSm90 {
         make_shape(shape<1>(TileShape_MNK_QV{}), Int<kHeadDimV>{}, Int<kStages>{})));
     static_assert(CUTE_STATIC_V(size(SmemLayoutVMmaQV{})) == size(SmemLayoutVtMma{}));
 
-    // Only used if we're using cp.async to load V
+    // Only used if we're using cp_async to load V
     using SmemLayoutAtomVCpAsync = decltype(cutlass::gemm::collective::detail::ss_smem_selector<GMMA::Major::K, Element,
         decltype(cute::get<1>(TileShape_MNK{})), Int<kHeadDimV>>());
     using SmemLayoutVCpAsync = decltype(tile_to_shape(
@@ -288,9 +288,9 @@ struct CollectiveMainloopFwdSm90 {
     using MainloopPipelineKVNew = PipelineTmaAsync;
     using PipelineState = cutlass::PipelineState<kStages>;
 
-    // If PackGQA, we use cp.async (instead of TMA) to load Q, so we want smem_q to be aligned
+    // If PackGQA, we use cp_async (instead of TMA) to load Q, so we want smem_q to be aligned
     // and have sQ being position_independent_swizzle_tensor.
-    // If !Use_TMA_KV, we use cp.async (instead of TMA) to load K & V, so we want smem_k and smem_v to be aligned.
+    // If !Use_TMA_KV, we use cp_async (instead of TMA) to load K & V, so we want smem_k and smem_v to be aligned.
     static constexpr size_t SmemAlignmentQ = Use_TMA_Q && !MmaQK_is_RS ? 128 : cutlass::detail::alignment_for_swizzle(SmemLayoutQ{});
     static constexpr size_t SmemAlignmentK = Use_TMA_KV && !AppendKV ? 128 : cutlass::detail::alignment_for_swizzle(SmemLayoutK{});
     static constexpr size_t SmemAlignmentVtNoTranspose = cutlass::detail::alignment_for_swizzle(SmemLayoutVt{});
@@ -631,7 +631,7 @@ struct CollectiveMainloopFwdSm90 {
         }();
         // Only used if Transpose_V
         Tensor sV = cute::as_position_independent_swizzle_tensor(make_tensor(make_smem_ptr(shared_storage.tensors.mainloop.smem_v.data()), SmemLayoutVtMma{}));
-        // Only used if we're using cp.async to load V
+        // Only used if we're using cp_async to load V
         Tensor sVcpasync = [&] {
             if constexpr (!Transpose_V) {
                 return cute::as_position_independent_swizzle_tensor(make_tensor(make_smem_ptr(shared_storage.tensors.mainloop.smem_v.data()), SmemLayoutVCpAsync{}));
@@ -825,7 +825,7 @@ struct CollectiveMainloopFwdSm90 {
                         tQvgQv, tQvsQv);
                 }
             }
-        } else {  // Load Q with cp.async
+        } else {  // Load Q with cp_async
             cutlass::arch::NamedBarrier::sync(NumMmaThreadsQK + NumProducerThreads, static_cast<uint32_t>(FwdNamedBarriers::QueryEmpty) /*id*/);
             Tensor mQ = make_tensor(make_gmem_ptr(params.ptr_Q + seqlen_info.offset_q * get<0>(params.stride_Q)), params.shape_Q_packed, params.stride_Q_packed)(_, _, bidh, !is_varlen_q ? bidb : 0);
             Tensor sQ_pi = cute::as_position_independent_swizzle_tensor(sQ);
