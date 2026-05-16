@@ -536,7 +536,7 @@ struct CollectiveMainloopFwdSm80 {
                 if (Is_first_stage || n_block - stage >= n_block_min) {
                     load_K(n_block - stage, stage, cute::bool_constant<Is_first_stage>{} /*Seqlenk_mask*/);
                 }
-                // We want the fence outside the if statement to have a fixed number of cp.async commits.
+                // We want the fence outside the if statement to have a fixed number of cp_async commits.
                 // so that we can wait with the correct number of outstanding commits.
                 cute::cp_async_fence();
             }
