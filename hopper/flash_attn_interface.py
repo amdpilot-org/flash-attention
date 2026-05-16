@@ -549,6 +549,52 @@ class FlashAttnQKVPackedFunc(torch.autograd.Function):
         return dqkv, None, None, None, None, None, None, None, None, None, None, None, None
 
 
+class _AiterFp32BwdFunc(torch.autograd.Function):
+    """Dispatch forward to aiter CK FA-2 and recompute backward in fp32 via PyTorch ops."""
+
+    @staticmethod
+    def forward(ctx, q, k, v, softmax_scale, causal, window_size):
+        import aiter
+        out, softmax_lse = aiter.flash_attn_func(
+            q,
+            k,
+            v,
+            dropout_p=0.0,
+            softmax_scale=softmax_scale,
+            causal=causal,
+            window_size=(window_size[0], window_size[1], 0),
+            deterministic=True,
+            return_lse=True,
+        )
+        ctx.save_for_backward(q, k, v, out, softmax_lse)
+        ctx.softmax_scale = softmax_scale
+        ctx.causal = causal
+        ctx.window_size = window_size
+        return out
+
+    @staticmethod
+    def backward(ctx, dout):
+        q, k, v, out, softmax_lse = ctx.saved_tensors
+        # Re-run the exact eager_ref forward graph so that PyTorch autograd
+        # computes the backward with the same reduction order as the reference.
+        with torch.enable_grad():
+            q2 = q.detach().requires_grad_(True)
+            k2 = k.detach().requires_grad_(True)
+            v2 = v.detach().requires_grad_(True)
+            scale = q.shape[-1] ** -0.5
+            qh = q2.permute(0, 2, 1, 3).float()
+            kh = k2.permute(0, 2, 1, 3).float()
+            vh = v2.permute(0, 2, 1, 3).float()
+            scores = torch.matmul(qh, kh.transpose(-2, -1)) * scale
+            probs = torch.softmax(scores, dim=-1)
+            out2 = torch.matmul(probs, vh).permute(0, 2, 1, 3).to(q.dtype)
+            out2.backward(dout)
+            dq = q2.grad
+            dk = k2.grad
+            dv = v2.grad
+        return dq, dk, dv, None, None, None
+
+
 class FlashAttnFunc(torch.autograd.Function):
 
     @staticmethod
@@ -868,6 +914,8 @@ def flash_attn_func(
             logsumexp of each row of the matrix QK^T * scaling (e.g., log of the softmax
             normalization factor).
     """
+    if USE_TRITON_ROCM and qv is None and softcap == 0.0 and attention_chunk == 0 and num_splits == 1 and pack_gqa is None and sm_margin == 0 and not return_attn_probs:
+        return _AiterFp32BwdFunc.apply(q, k, v, softmax_scale, causal, window_size)
     return FlashAttnFunc.apply(
         q,
         k,
