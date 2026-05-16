@@ -8,15 +8,16 @@ import torch.nn as nn
 import warnings
 
 
+FLASH_ATTENTION_AMD_FA3 = os.getenv("FLASH_ATTENTION_AMD_FA3", "FALSE") == "TRUE"
 USE_TRITON_ROCM = os.getenv("FLASH_ATTENTION_TRITON_AMD_ENABLE", "FALSE") == "TRUE"
-if not USE_TRITON_ROCM and getattr(torch.version, 'hip', None) is not None:
+if not USE_TRITON_ROCM and not FLASH_ATTENTION_AMD_FA3 and getattr(torch.version, 'hip', None) is not None:
     try:
         import flash_attn_3._C
     except ImportError:
         warnings.warn("flash_attn_3._C (which has ROCm/HIP kernels) not found, falling back to Triton implementation")
         USE_TRITON_ROCM = True
 
-if USE_TRITON_ROCM:
+if USE_TRITON_ROCM or FLASH_ATTENTION_AMD_FA3:
     from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_3 as flash_attn_3_gpu
 else:
     # isort: off
@@ -868,6 +869,35 @@ def flash_attn_func(
             logsumexp of each row of the matrix QK^T * scaling (e.g., log of the softmax
             normalization factor).
     """
+    # Inference fast-path: bypass autograd.Function overhead when gradients are off
+    if not torch.is_grad_enabled() or not (q.requires_grad or k.requires_grad or v.requires_grad):
+        if softmax_scale is None:
+            softmax_scale = (q.shape[-1] + (qv.shape[-1] if qv is not None else 0)) ** (-0.5)
+        out, softmax_lse, *_ = _flash_attn_forward(
+            q, k, v,
+            None, None,  # k_new, v_new
+            qv,  # qv
+            None,  # out
+            None, None, None,   # cu_seqlens_q/k/k_new
+            None, None,   # seqused_q/k
+            None, None,   # max_seqlen_q/k
+            None, None, None,   # page_table, kv_batch_idx, leftpad_k
+            None, None, None,  # rotary_cos/sin, seqlens_rotary
+            q_descale, k_descale, v_descale,
+            softmax_scale,
+            causal=causal,
+            window_size_left=window_size[0],
+            window_size_right=window_size[1],
+            attention_chunk=attention_chunk,
+            softcap=softcap,
+            num_splits=num_splits,
+            pack_gqa=pack_gqa,
+            sm_margin=sm_margin,
+        )
+        if return_attn_probs:
+            return out, softmax_lse
+        return out
+
     return FlashAttnFunc.apply(
         q,
         k,
