@@ -9,15 +9,79 @@ import warnings
 
 
 USE_TRITON_ROCM = os.getenv("FLASH_ATTENTION_TRITON_AMD_ENABLE", "FALSE") == "TRUE"
+USE_AITER_CK_ROCM = False
 if not USE_TRITON_ROCM and getattr(torch.version, 'hip', None) is not None:
     try:
         import flash_attn_3._C
     except ImportError:
-        warnings.warn("flash_attn_3._C (which has ROCm/HIP kernels) not found, falling back to Triton implementation")
-        USE_TRITON_ROCM = True
+        # Before falling back to Triton, try AITER's compiled CK/MFMA FMHA v3 path for gfx950.
+        try:
+            from aiter.ops.mha import fmha_v3_fwd as _aiter_fmha_v3_fwd
+            USE_AITER_CK_ROCM = True
+            warnings.warn("flash_attn_3._C not found; using AITER CK FMHA v3 (gfx950 MFMA) path")
+        except ImportError:
+            warnings.warn("flash_attn_3._C (which has ROCm/HIP kernels) not found, falling back to Triton implementation")
+            USE_TRITON_ROCM = True
 
 if USE_TRITON_ROCM:
     from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_3 as flash_attn_3_gpu
+elif USE_AITER_CK_ROCM:
+    class _AiterCKFlashAttn3Wrapper:
+        """Bridge the FA-3 interface to AITER's compiled CK/MFMA fmha_v3_fwd kernel on gfx950."""
+        @staticmethod
+        def fwd(q, k, v, k_new, v_new, qv, out_,
+                cu_seqlens_q, cu_seqlens_k, cu_seqlens_k_new,
+                seqused_q, seqused_k, max_seqlen_q, max_seqlen_k,
+                page_table, kv_batch_idx, leftpad_k,
+                rotary_cos, rotary_sin, seqlens_rotary,
+                q_descale, k_descale, v_descale,
+                softmax_scale, causal, window_size_left, window_size_right,
+                attention_chunk, softcap, rotary_interleaved,
+                scheduler_metadata, num_splits, pack_gqa, sm_margin):
+            # AITER CK FMHA v3 supports basic forward attention on gfx950.
+            # For unsupported features (varlen, paged KV, rotary, softcap, etc.)
+            # raise so callers know the intended path is gated here.
+            unsupported = [k_new, v_new, qv, out_, cu_seqlens_q, cu_seqlens_k, cu_seqlens_k_new,
+                           seqused_q, seqused_k, max_seqlen_q, max_seqlen_k,
+                           page_table, kv_batch_idx, leftpad_k,
+                           rotary_cos, rotary_sin, seqlens_rotary,
+                           q_descale, k_descale, v_descale, scheduler_metadata]
+            if any(x is not None for x in unsupported):
+                raise NotImplementedError(
+                    "AITER CK FMHA v3 wrapper does not support varlen/paged/rotary/descale/scheduler_metadata"
+                )
+            if attention_chunk != 0:
+                raise NotImplementedError("AITER CK FMHA v3 wrapper does not support attention_chunk")
+            if softcap != 0.0:
+                raise NotImplementedError("AITER CK FMHA v3 wrapper does not support softcap")
+            out, softmax_lse, *_ = _aiter_fmha_v3_fwd(
+                q, k, v,
+                dropout_p=0.0,
+                softmax_scale=softmax_scale,
+                is_causal=causal,
+                window_size_left=window_size_left,
+                window_size_right=window_size_right,
+                return_softmax_lse=True,
+                return_dropout_randval=False,
+                how_v3_bf16_cvt=0,
+            )
+            out_accum = torch.tensor([], device=out.device, dtype=torch.float32)
+            softmax_lse_accum = torch.tensor([], device=out.device, dtype=torch.float32)
+            return out, softmax_lse, out_accum, softmax_lse_accum
+
+        @staticmethod
+        def bwd(*args, **kwargs):
+            raise NotImplementedError("AITER CK FMHA v3 wrapper backward not yet implemented; use Triton fallback")
+
+        @staticmethod
+        def fwd_combine(*args, **kwargs):
+            raise NotImplementedError("AITER CK FMHA v3 wrapper fwd_combine not yet implemented; use Triton fallback")
+
+        @staticmethod
+        def get_scheduler_metadata(*args, **kwargs):
+            raise NotImplementedError("AITER CK FMHA v3 wrapper scheduler metadata not yet implemented")
+
+    flash_attn_3_gpu = _AiterCKFlashAttn3Wrapper()
 else:
     # isort: off
     # We need to import the CUDA kernels after importing torch
