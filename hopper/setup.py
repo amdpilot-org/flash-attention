@@ -43,9 +43,11 @@ FORCE_BUILD = os.getenv("FLASH_ATTENTION_FORCE_BUILD", "FALSE") == "TRUE"
 SKIP_CUDA_BUILD = os.getenv("FLASH_ATTENTION_SKIP_CUDA_BUILD", "FALSE") == "TRUE"
 # For CI, we want the option to build with C++11 ABI since the nvcr images use C++11 ABI
 FORCE_CXX11_ABI = os.getenv("FLASH_ATTENTION_FORCE_CXX11_ABI", "FALSE") == "TRUE"
-# ROCm specific settings
+# ROCm / AMD FA-3 specific settings
+# Supports MI355X gfx950 and MI300X gfx942 via FLASH_ATTENTION_AMD_FA3
+FLASH_ATTENTION_AMD_FA3 = os.getenv("FLASH_ATTENTION_AMD_FA3", "FALSE") == "TRUE"
 USE_TRITON_ROCM = os.getenv("FLASH_ATTENTION_TRITON_AMD_ENABLE", "FALSE") == "TRUE"
-if USE_TRITON_ROCM:
+if USE_TRITON_ROCM or FLASH_ATTENTION_AMD_FA3:
     SKIP_CUDA_BUILD = True
 
 DISABLE_BACKWARD = os.getenv("FLASH_ATTENTION_DISABLE_BACKWARD", "FALSE") == "TRUE"
@@ -427,6 +429,8 @@ cmdclass = {}
 ext_modules = []
 # We want this even if SKIP_CUDA_BUILD because when we run python setup.py sdist we want the .hpp
 # files included in the source distribution, in case the user compiles from source.
+create_build_config_file()
+
 if not USE_TRITON_ROCM:
     subprocess.run(["git", "submodule", "update", "--init", "../csrc/cutlass"])
 
@@ -435,7 +439,6 @@ if not SKIP_CUDA_BUILD:
     TORCH_MAJOR = int(torch.__version__.split(".")[0])
     TORCH_MINOR = int(torch.__version__.split(".")[1])
 
-    create_build_config_file()
     check_if_cuda_home_none(PACKAGE_NAME)
     _, bare_metal_version = get_cuda_bare_metal_version(CUDA_HOME)
     if bare_metal_version < Version("12.3"):
@@ -706,17 +709,8 @@ class CachedWheelsCommand(_bdist_wheel):
 setup(
     name=PACKAGE_NAME,
     version=get_package_version(),
-    packages=find_packages(
-        exclude=(
-            "build",
-            "csrc",
-            "include",
-            "tests",
-            "dist",
-            "docs",
-            "benchmarks",
-        )
-    ),
+    packages=["flash_attn_3"],
+    package_dir={"flash_attn_3": "."},
     py_modules=["flash_attn_interface", "flash_attn_config"],
     description="FlashAttention-3",
     long_description=long_description,
