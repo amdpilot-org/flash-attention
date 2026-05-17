@@ -224,16 +224,16 @@ CUTLASS_DEVICE void convert_type_out(Tensor<Engine, Layout> const &tensor, Tenso
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Blocks until all but N previous cp.async.commit_group operations have committed.
-// This differs from cute::cp_async_wait in that when N = 0 we don't call cp.async.wait_all
+// Blocks until all but N previous cp_async.commit_group operations have committed.
+// This differs from cute::cp_async_wait in that when N = 0 we don't call cp_async.wait_all
 // (which is equivalent to commit_group then wait_group 0).
-// Instead we just call cp.async.wait_group 0, which is slightly faster.
+// Instead we just call cp_async.wait_group 0, which is slightly faster.
 // https://github.com/NVIDIA/cutlass/blob/master/include/cute/arch/copy_sm80.hpp#L113
 template <int N>
 CUTE_HOST_DEVICE
 void cp_async_wait() {
 #if defined(CUTE_ARCH_CP_ASYNC_SM80_ENABLED)
-    asm volatile("cp.async.wait_group %0;\n" :: "n"(N));
+    asm volatile("cp_async.wait_group %0;\n" :: "n"(N));
 #endif
 }
 
@@ -267,7 +267,7 @@ CUTLASS_DEVICE void gemm(TiledMma& tiled_mma, Tensor0 const& tCrA, Tensor1 const
             gemm<zero_init, wg_wait, SwapAB, /*M_slice=*/-1>(tiled_mma, tCrA, tCrB_slice, tCrC_slice);
         }
     } else {
-        constexpr bool Is_RS = !cute::is_base_of<cute::GMMA::DescriptorIterator, typename TiledMma::FrgTypeA>::value;
+        constexpr bool Is_RS = !cute::is_base_of<cute::GMMA_ALIAS::DescriptorIterator, typename TiledMma::FrgTypeA>::value;
         // Need to cast away const on tCrA since warpgroup_fence_operand doesn't take const
         if constexpr (Is_RS) {
             if constexpr (!SwapAB) {
@@ -279,7 +279,7 @@ CUTLASS_DEVICE void gemm(TiledMma& tiled_mma, Tensor0 const& tCrA, Tensor1 const
         warpgroup_fence_operand(tCrC);
         warpgroup_arrive();
         if constexpr (zero_init) {
-            tiled_mma.accumulate_ = GMMA::ScaleOut::Zero;
+            tiled_mma.accumulate_ = GMMA_ALIAS::ScaleOut::Zero;
         }
         static constexpr int kNumKIters = CUTE_STATIC_V(size<2>(tCrA));
         static constexpr int kMaxKIters = 16;
@@ -291,7 +291,7 @@ CUTLASS_DEVICE void gemm(TiledMma& tiled_mma, Tensor0 const& tCrA, Tensor1 const
             } else {
                 cute::gemm(tiled_mma, tCrB(_,_,k_block), tCrA(_,_,k_block), tCrC);
             }
-            tiled_mma.accumulate_ = GMMA::ScaleOut::One;
+            tiled_mma.accumulate_ = GMMA_ALIAS::ScaleOut::One;
         }
         // In the case of large kNumKIters, the compiler chooses to store the smem addresses
         // in registers, causing spills. This loop forces the compiler to recompute the addresses.
@@ -306,7 +306,7 @@ CUTLASS_DEVICE void gemm(TiledMma& tiled_mma, Tensor0 const& tCrA, Tensor1 const
                 } else {
                     cute::gemm(tiled_mma, tCrB(_,_,k_block + k_offset), tCrA(_,_,k_block + k_offset), tCrC);
                 }
-                tiled_mma.accumulate_ = GMMA::ScaleOut::One;
+                tiled_mma.accumulate_ = GMMA_ALIAS::ScaleOut::One;
             }
         }
         warpgroup_commit_batch();
