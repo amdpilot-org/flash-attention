@@ -104,6 +104,61 @@ def _flash_attn_forward(
     ]
     rotary_cos, rotary_sin = [maybe_contiguous(x) for x in (rotary_cos, rotary_sin)]
     seqlens_rotary = maybe_contiguous(seqlens_rotary)
+
+    # gfx950 optimized FP8 forward path via AITER CK mha_fwd
+    if (
+        USE_TRITON_ROCM
+        and q.dtype == torch.float8_e4m3fn
+        and k_new is None
+        and v_new is None
+        and qv is None
+        and out_ is None
+        and cu_seqlens_q is None
+        and cu_seqlens_k is None
+        and cu_seqlens_k_new is None
+        and seqused_q is None
+        and seqused_k is None
+        and max_seqlen_q is None
+        and max_seqlen_k is None
+        and page_table is None
+        and kv_batch_idx is None
+        and leftpad_k is None
+        and rotary_cos is None
+        and rotary_sin is None
+        and seqlens_rotary is None
+        and q_descale is not None
+        and k_descale is not None
+        and v_descale is not None
+        and softcap == 0.0
+        and attention_chunk == 0
+        and scheduler_metadata is None
+    ):
+        try:
+            import aiter
+            out_ck, _, _, _ = aiter.mha_fwd(
+                q,
+                k,
+                v,
+                dropout_p=0.0,
+                softmax_scale=softmax_scale if softmax_scale is not None else q.shape[-1] ** -0.5,
+                is_causal=causal,
+                window_size_left=window_size_left if window_size_left is not None else -1,
+                window_size_right=window_size_right if window_size_right is not None else -1,
+                sink_size=0,
+                return_softmax_lse=False,
+                return_dropout_randval=False,
+                q_descale=q_descale,
+                k_descale=k_descale,
+                v_descale=v_descale,
+            )
+            batch_size, seqlen_q, nhead_q, _ = q.shape
+            softmax_lse_ck = torch.empty((batch_size, nhead_q, seqlen_q), dtype=torch.float32, device=q.device)
+            out_accum = torch.tensor([], device=out_ck.device)
+            softmax_lse_accum = torch.tensor([], device=out_ck.device)
+            return out_ck, softmax_lse_ck, out_accum, softmax_lse_accum
+        except Exception:
+            pass
+
     out, softmax_lse, out_accum, softmax_lse_accum = flash_attn_3_gpu.fwd(
         q,
         k,
@@ -868,6 +923,38 @@ def flash_attn_func(
             logsumexp of each row of the matrix QK^T * scaling (e.g., log of the softmax
             normalization factor).
     """
+    # Fast forward-only FP8 path on gfx950 via AITER CK (bypass autograd overhead)
+    if (
+        USE_TRITON_ROCM
+        and q.dtype == torch.float8_e4m3fn
+        and not torch.is_grad_enabled()
+        and qv is None
+        and attention_chunk == 0
+        and softcap == 0.0
+        and num_splits == 1
+        and pack_gqa is None
+        and sm_margin == 0
+        and not return_attn_probs
+        and q_descale is not None
+        and k_descale is not None
+        and v_descale is not None
+    ):
+        try:
+            import aiter
+            return aiter.flash_attn_fp8_pertensor_func(
+                q,
+                k,
+                v,
+                q_descale,
+                k_descale,
+                v_descale,
+                causal=causal,
+                window_size=(window_size[0], window_size[1], 0) if len(window_size) >= 2 else (-1, -1, 0),
+                softmax_scale=softmax_scale,
+            )
+        except Exception:
+            pass
+
     return FlashAttnFunc.apply(
         q,
         k,
