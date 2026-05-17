@@ -46,7 +46,7 @@ public:
     using R2STiledCopydQaccum = decltype(make_tiled_copy(Copy_Atom<AutoVectorizingCopyWithAssumedAlignment<128>, ElementAccum>{}, R2SLayoutAtomdQaccum{},
                                                          Layout<Shape<Int<IsSm90 ? 4 : 1>>>{}));  // Val layout, 1 or 4 vals per read
     using G2SLayoutAtomdQaccum = Layout<Shape<Int<kNThreads>>>;
-    // UniversalCopy instead of AutoVectorizingCopyWithAssumedAlignment as the latter generates cp.async instructions
+    // UniversalCopy instead of AutoVectorizingCopyWithAssumedAlignment as the latter generates cp_async instructions
     using G2STiledCopydQaccum = decltype(make_tiled_copy(Copy_Atom<UniversalCopy<uint128_t>, ElementAccum>{}, G2SLayoutAtomdQaccum{},
                                                          Layout<Shape<_4>>{}));  // Val layout, 4 vals per read
     // We don't do bound checking for the gmem -> smem load so we just assert here.

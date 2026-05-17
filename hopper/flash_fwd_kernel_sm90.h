@@ -78,7 +78,7 @@ public:
     static_assert(NumMmaWarpGroups == 1 || NumMmaWarpGroups == 2 || NumMmaWarpGroups == 3);
 
     /// Register requirement for Load and Math WGs
-    // If we use cp.async to load K and V, we need more registers for the producer WG.
+    // If we use cp_async to load K and V, we need more registers for the producer WG.
     static constexpr uint32_t LoadRegisterRequirement = NumMmaWarpGroups == 1 ? 56 : (NumMmaWarpGroups == 2 ? (Use_TMA_KV ? 24 : 40) : 32);
     static constexpr uint32_t MmaRegisterRequirement = NumMmaWarpGroups == 1 ? 256 : (NumMmaWarpGroups == 2 ? (Use_TMA_KV ? 240 : 232) : 160);
     // If you want to print from the producer warp, you'd need to increase the number of registers
@@ -309,7 +309,7 @@ public:
             cutlass::arch::warpgroup_reg_dealloc<LoadRegisterRequirement>();
 
             // The pipelines for AppendKV and main attention are different, since e.g. main attention
-            // might use cp.async to load KV (if PagedKVNonTMA) while AppendKV always uses TMA to load
+            // might use cp_async to load KV (if PagedKVNonTMA) while AppendKV always uses TMA to load
             // KV_new. Since the pipeline states are different, we have to manually sync to make
             // sure the two pipelines don't race when accessing smem_k and smem_v.
             PipelineState smem_pipe_write = cutlass::make_producer_start_state<MainloopPipelineK>();
@@ -396,7 +396,7 @@ public:
                         // if (threadIdx.x == 128) { printf("Consumer: Before sync\n"); }
                         // We need this sync so that the gmem write from the consumers is visible to the producer
                         // that might do TMA read after that.
-                        asm volatile ("fence.proxy.async.global;");
+                        asm volatile ("fence_proxy.async.global;");
                         cutlass::arch::NamedBarrier::arrive(NumMmaThreads + NumProducerThreads, static_cast<uint32_t>(FwdNamedBarriers::AppendKV) /*id*/);
                         // arrive is enough, we don't need sync. The producer will sync, which means
                         // after that sync we're guaranteed that the AppendKV pipeline have finished
