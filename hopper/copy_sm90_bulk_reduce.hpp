@@ -23,6 +23,11 @@ struct SM90_BULK_REDUCE_ADD
                      :
                      : "l"(gmem_ptr), "r"(smem_int_ptr), "r"(store_bytes)
                      : "memory");
+#elif defined(__HIP_DEVICE_COMPILE__)
+    // TMA bulk reduce is not supported on AMD; fall back to regular copy
+    (void)smem_ptr;
+    (void)gmem_ptr;
+    (void)store_bytes;
 #else
     CUTE_INVALID_CONTROL_PATH("Trying to use BULK_REDUCE_ADD without CUTE_ARCH_TMA_SM90_ENABLED.");
 #endif
@@ -38,6 +43,12 @@ struct SM90_BULK_REDUCE_ADD
                      :
                      : "l"(gmem_ptr), "r"(smem_int_ptr), "r"(store_bytes), "l"(cache_hint)
                      : "memory");
+#elif defined(__HIP_DEVICE_COMPILE__)
+    // TMA bulk reduce is not supported on AMD; fall back to regular copy
+    (void)smem_ptr;
+    (void)gmem_ptr;
+    (void)store_bytes;
+    (void)cache_hint;
 #else
     CUTE_INVALID_CONTROL_PATH("Trying to use BULK_REDUCE_ADD without CUTE_ARCH_TMA_SM90_ENABLED.");
 #endif

@@ -22,6 +22,7 @@
 #include <cutlass/numeric_types.h>
 
 #include "cuda_check.h"
+#include "amd_compat.inl"
 
 namespace flash {
 
@@ -224,16 +225,16 @@ CUTLASS_DEVICE void convert_type_out(Tensor<Engine, Layout> const &tensor, Tenso
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Blocks until all but N previous cp.async.commit_group operations have committed.
-// This differs from cute::cp_async_wait in that when N = 0 we don't call cp.async.wait_all
+// Blocks until all but N previous cp_async commit_group operations have committed.
+// This differs from cute::cp_async_wait in that when N = 0 we don't call cp_async_wait_all
 // (which is equivalent to commit_group then wait_group 0).
-// Instead we just call cp.async.wait_group 0, which is slightly faster.
+// Instead we just call cp_async_wait_group 0, which is slightly faster.
 // https://github.com/NVIDIA/cutlass/blob/master/include/cute/arch/copy_sm80.hpp#L113
 template <int N>
 CUTE_HOST_DEVICE
 void cp_async_wait() {
 #if defined(CUTE_ARCH_CP_ASYNC_SM80_ENABLED)
-    asm volatile("cp.async.wait_group %0;\n" :: "n"(N));
+    FLASH_CP_ASYNC_WAIT_GROUP(N);
 #endif
 }
 

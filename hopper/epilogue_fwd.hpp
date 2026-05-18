@@ -245,7 +245,7 @@ struct CollectiveEpilogueFwd {
         // Make sure all WGs have finished reading V
         // Technically we don't need this if we're not using smem, but the mainloop makes the assumption that
         // all epilogue threads sync at least once during the epilogue (so that we can start loading Q with
-        // cp.async if we need).
+        // cp_async if we need).
         flash::named_barrier_sync(NumEpilogueThreads, cutlass::arch::ReservedNamedBarriers::EpilogueBarrier);
 
         // Step 1: Write O from rmem -> smem
