@@ -261,7 +261,7 @@ struct PagedKVManager {
         int const seqlenk_row_limit = seqlen_k - n_block * kBlockN - get<0>(tVcV(_0{}, _0{}, _0{}));
         #pragma unroll
         for (int m = 0; m < size<1>(tVsV); ++m) {
-            // Faster to rely on the cp.async to clear smem that are out of bound,
+            // Faster to rely on the cp_async to clear smem that are out of bound,
             // rather than calling cute::clear directly.
             // We have to be careful not to write to smem past `kBlockN` if !EvenN.
             // If kBlockN doesn't evenly divide the tiled copy, only the last `m` needs to checked
