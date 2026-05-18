@@ -17,7 +17,7 @@ if not USE_TRITON_ROCM and getattr(torch.version, 'hip', None) is not None:
         USE_TRITON_ROCM = True
 
 if USE_TRITON_ROCM:
-    from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_3 as flash_attn_3_gpu
+    from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_3 as _flash_attn_3_gpu
 else:
     # isort: off
     # We need to import the CUDA kernels after importing torch
@@ -25,7 +25,81 @@ else:
 
     # isort: on
 
-    flash_attn_3_gpu = torch.ops.flash_attn_3
+    _flash_attn_3_gpu = torch.ops.flash_attn_3
+
+
+# AMD MI355X gfx950: prefer AITER CK/MFMA FMHA v3 over Triton fallback for bf16/hd128.
+class _AiterV3Wrapper:
+    @staticmethod
+    def fwd(q, k, v, k_new=None, v_new=None, qv=None, out_=None,
+            cu_seqlens_q=None, cu_seqlens_k=None, cu_seqlens_k_new=None,
+            seqused_q=None, seqused_k=None, max_seqlen_q=None, max_seqlen_k=None,
+            page_table=None, kv_batch_idx=None, leftpad_k=None,
+            rotary_cos=None, rotary_sin=None, seqlens_rotary=None,
+            q_descale=None, k_descale=None, v_descale=None,
+            softmax_scale=None, causal=False, window_size_left=-1, window_size_right=-1,
+            attention_chunk=0, softcap=0.0, rotary_interleaved=True,
+            scheduler_metadata=None, num_splits=1, pack_gqa=None, sm_margin=0):
+        # Conditions for AITER CK FMHA v3 on gfx950: aligned with prebuilt .co kernels.
+        # If unsupported, fall back to the original Triton / _C path.
+        try:
+            import aiter
+            arch = torch.cuda.get_device_properties(q.device).gcnArchName
+            if "gfx950" not in arch:
+                raise RuntimeError("not gfx950")
+            if q.dtype not in (torch.bfloat16,):
+                raise RuntimeError("dtype not bf16")
+            if q.shape[-1] not in (128, 192):
+                raise RuntimeError("head_dim not 128/192")
+            if window_size_left != -1 or window_size_right != -1:
+                raise RuntimeError("sliding window unsupported")
+            if attention_chunk != 0 or softcap != 0.0:
+                raise RuntimeError("attention_chunk/softcap unsupported")
+            if any(x is not None for x in (k_new, v_new, qv, out_, cu_seqlens_q, cu_seqlens_k,
+                                            cu_seqlens_k_new, seqused_q, seqused_k, max_seqlen_q,
+                                            max_seqlen_k, page_table, kv_batch_idx, leftpad_k,
+                                            rotary_cos, rotary_sin, seqlens_rotary,
+                                            q_descale, k_descale, v_descale)):
+                raise RuntimeError("advanced features unsupported")
+
+            if softmax_scale is None:
+                softmax_scale = q.shape[-1] ** (-0.5)
+            out, softmax_lse = aiter.flash_attn_func(
+                q, k, v,
+                dropout_p=0.0,
+                softmax_scale=softmax_scale,
+                causal=causal,
+                window_size=(window_size_left, window_size_right, 0),
+                bias=None,
+                alibi_slopes=None,
+                deterministic=True,
+                return_lse=True,
+                return_attn_probs=False,
+                how_v3_bf16_cvt=1,
+            )
+            return out, softmax_lse, None, None
+        except Exception:
+            return _flash_attn_3_gpu.fwd(
+                q, k, v, k_new, v_new, qv, out_, cu_seqlens_q, cu_seqlens_k, cu_seqlens_k_new,
+                seqused_q, seqused_k, max_seqlen_q, max_seqlen_k, page_table, kv_batch_idx, leftpad_k,
+                rotary_cos, rotary_sin, seqlens_rotary, q_descale, k_descale, v_descale,
+                softmax_scale, causal, window_size_left, window_size_right, attention_chunk,
+                softcap, rotary_interleaved, scheduler_metadata, num_splits, pack_gqa, sm_margin,
+            )
+
+
+# Detect gfx950 at import time and prefer the CK/MFMA v3 wrapper.
+if getattr(torch.version, 'hip', None) is not None:
+    try:
+        _dev_prop = torch.cuda.get_device_properties(0)
+        if "gfx950" in getattr(_dev_prop, 'gcnArchName', ''):
+            flash_attn_3_gpu = _AiterV3Wrapper()
+        else:
+            flash_attn_3_gpu = _flash_attn_3_gpu
+    except Exception:
+        flash_attn_3_gpu = _flash_attn_3_gpu
+else:
+    flash_attn_3_gpu = _flash_attn_3_gpu
 
 def maybe_contiguous(x):
     return x.contiguous() if x is not None and x.stride(-1) != 1 else x
