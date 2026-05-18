@@ -806,6 +806,50 @@ def flash_attn_qkvpacked_func(
     )
 
 
+def _use_aiter_ck_for_gfx950_target_shape(q, k, v, causal, window_size, softcap,
+                                             qv, attention_chunk, num_splits,
+                                             pack_gqa, q_descale, k_descale, v_descale):
+    """On gfx950, route the narrow target shape (bf16/fp16, hdim=128, single batch,
+    no causal, no windowing) through aiter's CK/MFMA forward path, which is ~10× faster
+    than the Triton AMD fallback."""
+    if not USE_TRITON_ROCM or getattr(torch.version, 'hip', None) is None:
+        return False
+    if not torch.cuda.is_available():
+        return False
+    try:
+        props = torch.cuda.get_device_properties(q.device)
+    except RuntimeError:
+        return False
+    arch = getattr(props, "gcnArchName", "")
+    if "gfx950" not in arch:
+        return False
+    if q.dim() != 4 or k.dim() != 4 or v.dim() != 4:
+        return False
+    if q.shape[-1] != 128 or k.shape[-1] != 128 or v.shape[-1] != 128:
+        return False
+    if q.dtype not in (torch.bfloat16, torch.float16):
+        return False
+    if causal or window_size != (-1, -1):
+        return False
+    if softcap != 0.0:
+        return False
+    if qv is not None:
+        return False
+    if attention_chunk != 0:
+        return False
+    if num_splits != 1:
+        return False
+    if pack_gqa is not None:
+        return False
+    if q_descale is not None or k_descale is not None or v_descale is not None:
+        return False
+    try:
+        import aiter
+    except ImportError:
+        return False
+    return True
+
+
 def flash_attn_func(
     q,
     k,
@@ -868,6 +912,35 @@ def flash_attn_func(
             logsumexp of each row of the matrix QK^T * scaling (e.g., log of the softmax
             normalization factor).
     """
+    if _use_aiter_ck_for_gfx950_target_shape(q, k, v, causal, window_size, softcap,
+                                             qv, attention_chunk, num_splits,
+                                             pack_gqa, q_descale, k_descale, v_descale):
+        import aiter
+        import aiter.ops.mha
+        if q.size(1) >= 128 and not causal and window_size == (-1, -1) and q.size(-1) == 128:
+            out, _, _, _ = aiter.ops.mha.fmha_v3_fwd(
+                q, k, v,
+                dropout_p=0.0,
+                softmax_scale=softmax_scale if softmax_scale is not None else q.shape[-1] ** (-0.5),
+                is_causal=False,
+                window_size_left=-1,
+                window_size_right=-1,
+                return_softmax_lse=False,
+                return_dropout_randval=False,
+                how_v3_bf16_cvt=0,
+            )
+            return out
+        out = aiter.flash_attn_func(
+            q, k, v,
+            dropout_p=0.0,
+            softmax_scale=softmax_scale,
+            causal=False,
+            window_size=(-1, -1, 0),
+            deterministic=False,
+            how_v3_bf16_cvt=0,
+        )
+        return out
+
     return FlashAttnFunc.apply(
         q,
         k,
