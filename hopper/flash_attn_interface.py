@@ -104,6 +104,16 @@ def _flash_attn_forward(
     ]
     rotary_cos, rotary_sin = [maybe_contiguous(x) for x in (rotary_cos, rotary_sin)]
     seqlens_rotary = maybe_contiguous(seqlens_rotary)
+    # AMD Triton backend returns float32 for FP8 when out_ is None, but the
+    # flash-attention contract requires bfloat16 output for FP8 inputs.
+    # Pre-allocate the correct output tensor so the Triton kernel writes into
+    # it directly, avoiding a later dtype cast and matching the expected spec.
+    if USE_TRITON_ROCM and out_ is None and q.dtype == torch.float8_e4m3fn:
+        out_dtype = torch.bfloat16
+        if cu_seqlens_q is None:
+            out_ = torch.empty(q.shape[0], q.shape[1], q.shape[2], v.shape[-1], dtype=out_dtype, device=q.device)
+        else:
+            out_ = torch.empty(q.shape[0], q.shape[1], v.shape[-1], dtype=out_dtype, device=q.device)
     out, softmax_lse, out_accum, softmax_lse_accum = flash_attn_3_gpu.fwd(
         q,
         k,
@@ -220,10 +230,8 @@ def _flash_attn_forward_fake(
 
     # Create output tensor
     if out_ is not None:
-        # If out_ is provided, _flash_attn_forward becomes non-functional
-        raise TypeError("Tracing (torch.compile/torch.export) with pre-allocated output tensor is not supported.")
-
-    if is_varlen_q:
+        out = out_
+    elif is_varlen_q:
         out = torch.empty((total_q, num_heads, head_size_v), dtype=out_dtype, device=q.device)
     else:
         out = torch.empty((batch_size, seqlen_q, num_heads, head_size_v), dtype=out_dtype, device=q.device)
@@ -569,6 +577,7 @@ class FlashAttnFunc(torch.autograd.Function):
         deterministic=False,
         sm_margin=0,
         return_softmax=False,
+        out_=None,
     ):
         if softmax_scale is None:
             softmax_scale = (q.shape[-1] + (qv.shape[-1] if qv is not None else 0)) ** (-0.5)
@@ -822,6 +831,7 @@ def flash_attn_func(
     deterministic=False,
     sm_margin=0,
     return_attn_probs=False,
+    out=None,
 ):
     """dropout_p should be set to 0.0 during evaluation
     Supports multi-query and grouped-query attention (MQA/GQA) by passing in KV with fewer heads
@@ -884,6 +894,7 @@ def flash_attn_func(
         deterministic,
         sm_margin,
         return_attn_probs,
+        out,
     )
 
 
