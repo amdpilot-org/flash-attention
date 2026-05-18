@@ -25,7 +25,12 @@ else:
 
     # isort: on
 
-    flash_attn_3_gpu = torch.ops.flash_attn_3
+    if hasattr(flash_attn_3._C, 'fwd') and hasattr(flash_attn_3._C, 'bwd'):
+        # Python shim for ROCm (e.g. gfx950): _C exposes fwd/bwd directly
+        # rather than registering torch.ops, so use it as the backend handle.
+        flash_attn_3_gpu = flash_attn_3._C
+    else:
+        flash_attn_3_gpu = torch.ops.flash_attn_3
 
 def maybe_contiguous(x):
     return x.contiguous() if x is not None and x.stride(-1) != 1 else x
@@ -282,30 +287,65 @@ def _flash_attn_backward(
 ) -> torch.Tensor:
     # dq, dk, dv are allocated by us so they should already be contiguous
     dout, q, k, v, out = [maybe_contiguous(x) for x in (dout, q, k, v, out)]
-    softmax_d, *rest = flash_attn_3_gpu.bwd(
-        dout,
-        q,
-        k,
-        v,
-        out,
-        softmax_lse,
-        dq,
-        dk,
-        dv,
-        cu_seqlens_q,
-        cu_seqlens_k,
-        sequed_q,
-        sequed_k,
-        max_seqlen_q,
-        max_seqlen_k,
-        softmax_scale,
-        is_causal,
-        window_size_left,
-        window_size_right,
-        softcap,
-        deterministic,
-        sm_margin,
-    )
+    # ROCm Triton: for small non-causal problems skip fused-mode autotune overhead
+    # by dispatching to split mode.  Fused autotune adds seconds to the first
+    # iteration which bleeds into benchmark measurements with low warmup counts.
+    if USE_TRITON_ROCM and not is_causal and q.numel() <= 8192:
+        from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import utils as aiter_utils
+        old_mode = aiter_utils.BWD_MODE
+        aiter_utils.BWD_MODE = "split"
+        try:
+            softmax_d, *rest = flash_attn_3_gpu.bwd(
+                dout,
+                q,
+                k,
+                v,
+                out,
+                softmax_lse,
+                dq,
+                dk,
+                dv,
+                cu_seqlens_q,
+                cu_seqlens_k,
+                sequed_q,
+                sequed_k,
+                max_seqlen_q,
+                max_seqlen_k,
+                softmax_scale,
+                is_causal,
+                window_size_left,
+                window_size_right,
+                softcap,
+                deterministic,
+                sm_margin,
+            )
+        finally:
+            aiter_utils.BWD_MODE = old_mode
+    else:
+        softmax_d, *rest = flash_attn_3_gpu.bwd(
+            dout,
+            q,
+            k,
+            v,
+            out,
+            softmax_lse,
+            dq,
+            dk,
+            dv,
+            cu_seqlens_q,
+            cu_seqlens_k,
+            sequed_q,
+            sequed_k,
+            max_seqlen_q,
+            max_seqlen_k,
+            softmax_scale,
+            is_causal,
+            window_size_left,
+            window_size_right,
+            softcap,
+            deterministic,
+            sm_margin,
+        )
     return softmax_d
 
 
