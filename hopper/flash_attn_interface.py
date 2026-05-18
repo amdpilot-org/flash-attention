@@ -8,7 +8,9 @@ import torch.nn as nn
 import warnings
 
 
-USE_TRITON_ROCM = os.getenv("FLASH_ATTENTION_TRITON_AMD_ENABLE", "FALSE") == "TRUE"
+# On HIP/ROCm, Triton AMD is the only supported FA-3 path; default to it to avoid
+# loading a CUDA-built flash_attn_3._C extension that would crash.
+USE_TRITON_ROCM = os.getenv("FLASH_ATTENTION_TRITON_AMD_ENABLE", "TRUE" if getattr(torch.version, 'hip', None) is not None else "FALSE") == "TRUE"
 if not USE_TRITON_ROCM and getattr(torch.version, 'hip', None) is not None:
     try:
         import flash_attn_3._C
@@ -17,6 +19,7 @@ if not USE_TRITON_ROCM and getattr(torch.version, 'hip', None) is not None:
         USE_TRITON_ROCM = True
 
 if USE_TRITON_ROCM:
+    os.environ.setdefault("FLASH_ATTENTION_TRITON_AMD_AUTOTUNE", "0")  # Use validated single-config, skip autotune overhead
     from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_3 as flash_attn_3_gpu
 else:
     # isort: off
