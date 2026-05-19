@@ -396,7 +396,12 @@ public:
                         // if (threadIdx.x == 128) { printf("Consumer: Before sync\n"); }
                         // We need this sync so that the gmem write from the consumers is visible to the producer
                         // that might do TMA read after that.
+#ifndef __HIP_PLATFORM_AMD__
                         asm volatile ("fence.proxy.async.global;");
+#else
+                        // AMD/HIP does not support CUDA async-proxy fence PTX instruction.
+                        // Global memory visibility is handled by the subsequent NamedBarrier.
+#endif
                         cutlass::arch::NamedBarrier::arrive(NumMmaThreads + NumProducerThreads, static_cast<uint32_t>(FwdNamedBarriers::AppendKV) /*id*/);
                         // arrive is enough, we don't need sync. The producer will sync, which means
                         // after that sync we're guaranteed that the AppendKV pipeline have finished
