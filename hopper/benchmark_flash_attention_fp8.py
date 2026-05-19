@@ -30,6 +30,11 @@ try:
 except ImportError:
     cudnn = None
 
+try:
+    from aiter.ops.mha import mha_fwd as aiter_mha_fwd
+except ImportError:
+    aiter_mha_fwd = None
+
 
 def convert_to_cudnn_type(torch_type):
     if torch_type == torch.float16:
@@ -231,6 +236,7 @@ dropout_p = 0.0
 
 methods = (["Pytorch", "Flash3"]
         + (["cuDNN"] if cudnn is not None else [])
+        + (["AITER"] if aiter_mha_fwd is not None else [])
         # + (["Triton"] if attention_triton is not None else [])
         #    + (["xformers.c"] if xops is not None else [])
         #    + (["xformers.f"] if xops is not None else [])
@@ -303,6 +309,34 @@ for causal in causal_vals:
             # torch.testing.assert_close(res.half(), res_baseline, atol=0.05, rtol=0.05)
 
             time_f[config, "Flash3"] = f
+
+            if aiter_mha_fwd is not None:
+                q_aiter = q.to(torch.float8_e4m3fn)
+                k_aiter = k.to(torch.float8_e4m3fn)
+                v_aiter = v.to(torch.float8_e4m3fn)
+                out_aiter = torch.empty_like(v_aiter, dtype=torch.bfloat16)
+                # Default per-tensor descale path (uniform values)
+                descale_pt = torch.ones((batch_size, nheads), device=device, dtype=torch.float32)
+                f = time_fwd(
+                    lambda q,k,v: aiter_mha_fwd(q, k, v, 0.0, softmax_scale, causal, -1, -1, 0,
+                                                False, False, out=out_aiter,
+                                                q_descale=descale_pt, k_descale=descale_pt, v_descale=descale_pt),
+                    q_aiter, k_aiter, v_aiter,
+                    repeats=repeats, verbose=False
+                )
+                time_f[config, "AITER"] = f
+                # Per-head descale path for benchmarking comparison
+                descale_ph = torch.ones((batch_size, nheads), device=device, dtype=torch.float32)
+                for hi in range(nheads):
+                    descale_ph[:, hi] = 1.0 + (hi % 4) * 0.05
+                f_ph = time_fwd(
+                    lambda q,k,v: aiter_mha_fwd(q, k, v, 0.0, softmax_scale, causal, -1, -1, 0,
+                                                False, False, out=out_aiter,
+                                                q_descale=descale_ph, k_descale=descale_ph, v_descale=descale_ph),
+                    q_aiter, k_aiter, v_aiter,
+                    repeats=repeats, verbose=False
+                )
+                time_f[config, "AITER-PH"] = f_ph
 
             if cudnn is not None:
                 qkv_fp8 = qkv.to(dtype)
