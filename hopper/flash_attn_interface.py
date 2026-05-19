@@ -27,6 +27,110 @@ else:
 
     flash_attn_3_gpu = torch.ops.flash_attn_3
 
+
+# Helper to detect gfx950 for AITER CK FMHA v3 fast-path dispatch
+def _is_gfx950() -> bool:
+    try:
+        return torch.cuda.get_device_properties(0).gcnArchName.startswith("gfx950")
+    except Exception:
+        return False
+
+
+def _can_dispatch_aiter_ck_v3_fwd(
+    q: torch.Tensor,
+    k: torch.Tensor,
+    v: torch.Tensor,
+    k_new,
+    v_new,
+    qv,
+    out_,
+    cu_seqlens_q,
+    cu_seqlens_k,
+    cu_seqlens_k_new,
+    seqused_q,
+    seqused_k,
+    page_table,
+    kv_batch_idx,
+    leftpad_k,
+    rotary_cos,
+    rotary_sin,
+    seqlens_rotary,
+    q_descale,
+    k_descale,
+    v_descale,
+    causal,
+    window_size_left,
+    window_size_right,
+    attention_chunk,
+    softcap,
+    rotary_interleaved,
+    scheduler_metadata,
+    num_splits,
+    pack_gqa,
+    sm_margin,
+) -> bool:
+    """Return True when inputs are compatible with AITER CK FMHA v3 forward on gfx950."""
+    if not _is_gfx950():
+        return False
+    # Basic shape/dtype checks aligned with aiter can_impl_fmha_v3_fwd
+    if q.dtype != torch.bfloat16:
+        return False
+    if v.shape[-1] != 128:
+        return False
+    if q.shape[-1] not in (128, 192):
+        return False
+    if causal or window_size_left != -1 or window_size_right != -1:
+        return False
+    if softcap != 0.0 or attention_chunk != 0:
+        return False
+    if num_splits != 1:
+        return False
+    if k_new is not None or v_new is not None or qv is not None:
+        return False
+    if cu_seqlens_q is not None or cu_seqlens_k is not None or cu_seqlens_k_new is not None:
+        return False
+    if seqused_q is not None or seqused_k is not None:
+        return False
+    if page_table is not None or kv_batch_idx is not None or leftpad_k is not None:
+        return False
+    if rotary_cos is not None or rotary_sin is not None or seqlens_rotary is not None:
+        return False
+    if q_descale is not None or k_descale is not None or v_descale is not None:
+        return False
+    if sm_margin != 0 or pack_gqa is not None:
+        return False
+    if scheduler_metadata is not None:
+        return False
+    return True
+
+
+def _aiter_ck_v3_fwd(
+    q: torch.Tensor,
+    k: torch.Tensor,
+    v: torch.Tensor,
+    out_: Optional[torch.Tensor],
+    softmax_scale: Optional[float],
+):
+    """Call AITER CK FMHA v3 forward and return results in FA-3 forward format."""
+    from aiter.ops.mha import fmha_v3_fwd
+    if softmax_scale is None:
+        softmax_scale = q.shape[-1] ** (-0.5)
+    out, _, _, _ = fmha_v3_fwd(
+        q,
+        k,
+        v,
+        dropout_p=0.0,
+        softmax_scale=softmax_scale,
+        is_causal=False,
+        window_size_left=-1,
+        window_size_right=-1,
+        return_softmax_lse=False,
+        return_dropout_randval=False,
+        how_v3_bf16_cvt=0,
+        out=out_,
+    )
+    return out, torch.empty((0,), dtype=torch.float32, device=out.device), torch.tensor([], device=out.device), torch.tensor([], device=out.device)
+
 def maybe_contiguous(x):
     return x.contiguous() if x is not None and x.stride(-1) != 1 else x
 
@@ -104,42 +208,57 @@ def _flash_attn_forward(
     ]
     rotary_cos, rotary_sin = [maybe_contiguous(x) for x in (rotary_cos, rotary_sin)]
     seqlens_rotary = maybe_contiguous(seqlens_rotary)
-    out, softmax_lse, out_accum, softmax_lse_accum = flash_attn_3_gpu.fwd(
-        q,
-        k,
-        v,
-        k_new,
-        v_new,
-        qv,
-        out_,
-        cu_seqlens_q,
-        cu_seqlens_k,
-        cu_seqlens_k_new,
-        seqused_q,
-        seqused_k,
-        max_seqlen_q,
-        max_seqlen_k,
-        page_table,
-        kv_batch_idx,
-        leftpad_k,
-        rotary_cos,
-        rotary_sin,
-        seqlens_rotary,
-        q_descale,
-        k_descale,
-        v_descale,
-        softmax_scale,
-        causal,
-        window_size_left,
-        window_size_right,
-        attention_chunk,
-        softcap,
-        rotary_interleaved,
-        scheduler_metadata,
-        num_splits,
-        pack_gqa,
-        sm_margin,
-    )
+    if _can_dispatch_aiter_ck_v3_fwd(
+        q, k, v, k_new, v_new, qv, out_,
+        cu_seqlens_q, cu_seqlens_k, cu_seqlens_k_new,
+        seqused_q, seqused_k,
+        page_table, kv_batch_idx, leftpad_k,
+        rotary_cos, rotary_sin, seqlens_rotary,
+        q_descale, k_descale, v_descale,
+        causal, window_size_left, window_size_right,
+        attention_chunk, softcap, rotary_interleaved,
+        scheduler_metadata, num_splits, pack_gqa, sm_margin,
+    ):
+        out, softmax_lse, out_accum, softmax_lse_accum = _aiter_ck_v3_fwd(
+            q, k, v, out_, softmax_scale
+        )
+    else:
+        out, softmax_lse, out_accum, softmax_lse_accum = flash_attn_3_gpu.fwd(
+            q,
+            k,
+            v,
+            k_new,
+            v_new,
+            qv,
+            out_,
+            cu_seqlens_q,
+            cu_seqlens_k,
+            cu_seqlens_k_new,
+            seqused_q,
+            seqused_k,
+            max_seqlen_q,
+            max_seqlen_k,
+            page_table,
+            kv_batch_idx,
+            leftpad_k,
+            rotary_cos,
+            rotary_sin,
+            seqlens_rotary,
+            q_descale,
+            k_descale,
+            v_descale,
+            softmax_scale,
+            causal,
+            window_size_left,
+            window_size_right,
+            attention_chunk,
+            softcap,
+            rotary_interleaved,
+            scheduler_metadata,
+            num_splits,
+            pack_gqa,
+            sm_margin,
+        )
 
     if out_accum is None:
         out_accum = torch.tensor([], device=out.device)
