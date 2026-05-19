@@ -1214,6 +1214,29 @@ def flash_attn_func(
             The output of softmax (possibly with different scaling). It also encodes the dropout
             pattern (negative means that location was dropped, nonnegative means it was kept).
     """
+    if os.getenv("FLASH_ATTENTION_AMD_FA3", "FALSE") == "TRUE" and getattr(torch.version, 'hip', None) is not None:
+        try:
+            import aiter
+            if isinstance(window_size, (list, tuple)) and len(window_size) == 2:
+                aiter_window = (window_size[0], window_size[1], 0)
+            else:
+                aiter_window = window_size
+            return aiter.flash_attn_func(
+                q,
+                k,
+                v,
+                dropout_p=dropout_p,
+                softmax_scale=softmax_scale,
+                causal=causal,
+                window_size=aiter_window,
+                bias=None,
+                alibi_slopes=alibi_slopes,
+                deterministic=deterministic,
+                return_lse=return_attn_probs,
+                return_attn_probs=return_attn_probs,
+            )
+        except Exception:
+            pass
     return FlashAttnFunc.apply(
         q,
         k,
