@@ -23,6 +23,9 @@ struct SM90_BULK_REDUCE_ADD
                      :
                      : "l"(gmem_ptr), "r"(smem_int_ptr), "r"(store_bytes)
                      : "memory");
+#elif defined(__HIP_PLATFORM_AMD__)
+    // On AMD, fall back to a regular atomic add since TMA bulk reduce is not available.
+    atomicAdd(gmem_ptr, *smem_ptr);
 #else
     CUTE_INVALID_CONTROL_PATH("Trying to use BULK_REDUCE_ADD without CUTE_ARCH_TMA_SM90_ENABLED.");
 #endif
@@ -38,6 +41,9 @@ struct SM90_BULK_REDUCE_ADD
                      :
                      : "l"(gmem_ptr), "r"(smem_int_ptr), "r"(store_bytes), "l"(cache_hint)
                      : "memory");
+#elif defined(__HIP_PLATFORM_AMD__)
+    // On AMD, fall back to a regular atomic add since TMA bulk reduce is not available.
+    atomicAdd(gmem_ptr, *smem_ptr);
 #else
     CUTE_INVALID_CONTROL_PATH("Trying to use BULK_REDUCE_ADD without CUTE_ARCH_TMA_SM90_ENABLED.");
 #endif

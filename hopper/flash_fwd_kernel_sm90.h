@@ -306,7 +306,9 @@ public:
         TileScheduler scheduler(reinterpret_cast<typename TileScheduler::SharedStorage*>(&shared_storage.pipelines.smem_scheduler));
 
         if (warp_group_idx == 0) {  // Producer
+#if !defined(__HIP_PLATFORM_AMD__)
             cutlass::arch::warpgroup_reg_dealloc<LoadRegisterRequirement>();
+#endif
 
             // The pipelines for AppendKV and main attention are different, since e.g. main attention
             // might use cp.async to load KV (if PagedKVNonTMA) while AppendKV always uses TMA to load
@@ -358,7 +360,9 @@ public:
             }
             mainloop.load_tail(pipeline_k, pipeline_v, pipeline_vt, smem_pipe_write, shared_storage, work_idx);
         } else {  // Consumer
+#if !defined(__HIP_PLATFORM_AMD__)
             cutlass::arch::warpgroup_reg_alloc<MmaRegisterRequirement>();
+#endif
 
             // Initialize matmul objects.
             TiledMmaPV tiled_mma_pv;
@@ -396,7 +400,11 @@ public:
                         // if (threadIdx.x == 128) { printf("Consumer: Before sync\n"); }
                         // We need this sync so that the gmem write from the consumers is visible to the producer
                         // that might do TMA read after that.
+#if !defined(__HIP_PLATFORM_AMD__)
                         asm volatile ("fence.proxy.async.global;");
+#else
+                        __threadfence();
+#endif
                         cutlass::arch::NamedBarrier::arrive(NumMmaThreads + NumProducerThreads, static_cast<uint32_t>(FwdNamedBarriers::AppendKV) /*id*/);
                         // arrive is enough, we don't need sync. The producer will sync, which means
                         // after that sync we're guaranteed that the AppendKV pipeline have finished

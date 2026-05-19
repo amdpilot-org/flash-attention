@@ -209,7 +209,9 @@ public:
         TileScheduler scheduler(reinterpret_cast<typename TileScheduler::SharedStorage*>(&shared_storage.pipelines.smem_scheduler));
 
         if (warp_group_idx == 0) {  // Producer
+#if !defined(__HIP_PLATFORM_AMD__)
             cutlass::arch::warpgroup_reg_dealloc<LoadRegisterRequirement>();
+#endif
 
             int warp_idx_in_warpgroup = __shfl_sync(0xffffffff, (threadIdx.x / 32) % 4, 0);
             if (warp_idx_in_warpgroup == 0) {  // Load K, V, and do TMA on Q and dO
@@ -239,7 +241,9 @@ public:
                 }
             }
         } else {  // Consumer
+#if !defined(__HIP_PLATFORM_AMD__)
             cutlass::arch::warpgroup_reg_alloc<MmaRegisterRequirement>();
+#endif
             // Initialize matmul objects.
             TiledMmadKV tiled_mma_dKV;
 

@@ -47,7 +47,7 @@ template <typename Kernel>
 struct enable_sm80_to_sm89 : Kernel {
     template <typename... Args>
     CUTLASS_DEVICE void operator()(Args&&... args) {
-#if defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 800) && (__CUDA_ARCH__ <= 890)
+#if (defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 800) && (__CUDA_ARCH__ <= 890)) || defined(__HIP_PLATFORM_AMD__)
         Kernel::operator()(std::forward<Args>(args)...);
 #endif
     }
@@ -234,6 +234,8 @@ CUTE_HOST_DEVICE
 void cp_async_wait() {
 #if defined(CUTE_ARCH_CP_ASYNC_SM80_ENABLED)
     asm volatile("cp.async.wait_group %0;\n" :: "n"(N));
+#elif defined(__HIP_PLATFORM_AMD__)
+    __threadfence_block();
 #endif
 }
 
