@@ -9,6 +9,18 @@
 
 #include <cutlass/cutlass.h>
 
+#ifdef __HIP_PLATFORM_AMD__
+#define CHECK_CUDA(call)                        \
+    do {                                                                                                  \
+        hipError_t status_ = call;                                                                       \
+        if (status_ != hipSuccess) {                                                                     \
+            fprintf(stderr, "HIP error (%s:%d): %s\n", __FILE__, __LINE__, hipGetErrorString(status_)); \
+            exit(1);                                                                                      \
+        }                                                                                                 \
+    } while(0)
+
+#define CHECK_CUDA_KERNEL_LAUNCH() CHECK_CUDA(hipGetLastError())
+#else
 #define CHECK_CUDA(call)                        \
     do {                                                                                                  \
         cudaError_t status_ = call;                                                                       \
@@ -19,6 +31,7 @@
     } while(0)
 
 #define CHECK_CUDA_KERNEL_LAUNCH() CHECK_CUDA(cudaGetLastError())
+#endif
 
 #define CHECK_CUTLASS(call)                                                                               \
     do {                                                                                                  \

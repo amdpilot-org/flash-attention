@@ -234,6 +234,9 @@ CUTE_HOST_DEVICE
 void cp_async_wait() {
 #if defined(CUTE_ARCH_CP_ASYNC_SM80_ENABLED)
     asm volatile("cp.async.wait_group %0;\n" :: "n"(N));
+#elif defined(__HIP_PLATFORM_AMD__)
+    // cp.async PTX instructions are NVIDIA-only; on AMD this path is intentionally a no-op.
+    // Async copies on AMD use different mechanisms (e.g., global_load through L2).
 #endif
 }
 
