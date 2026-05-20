@@ -3,6 +3,7 @@
 from typing import Optional, Union, List, Tuple
 
 import os
+import sys
 import torch
 import torch.nn as nn
 import warnings
@@ -17,6 +18,10 @@ if not USE_TRITON_ROCM and getattr(torch.version, 'hip', None) is not None:
         USE_TRITON_ROCM = True
 
 if USE_TRITON_ROCM:
+    # Fix aiter namespace-package shadowing when /workspace/aiter is on sys.path
+    _sgl_aiter = os.path.join(os.sep, "sgl-workspace", "aiter")
+    if _sgl_aiter not in sys.path:
+        sys.path.insert(0, _sgl_aiter)
     from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_3 as flash_attn_3_gpu
 else:
     # isort: off
