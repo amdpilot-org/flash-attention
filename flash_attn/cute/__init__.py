@@ -1,4 +1,4 @@
-"""Flash Attention CUTE (CUDA Template Engine) implementation."""
+"""AMD MI355X TileLang-based implementation of the flash_attn.cute FA-4 API."""
 
 from importlib.metadata import PackageNotFoundError, version
 
@@ -7,7 +7,7 @@ try:
 except PackageNotFoundError:
     __version__ = "0.0.0"
 
-from .interface import (
+from .rocm_interface import (
     flash_attn_func,
     flash_attn_varlen_func,
 )
