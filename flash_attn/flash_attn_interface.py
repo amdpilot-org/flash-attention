@@ -4,6 +4,7 @@ from typing import Optional, Sequence, Tuple, Union
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import os
 import warnings
 
@@ -1602,6 +1603,41 @@ def flash_attn_with_kvcache(
         cache_seqlens = maybe_contiguous(cache_seqlens)
     cache_batch_idx = maybe_contiguous(cache_batch_idx)
     block_table = maybe_contiguous(block_table)
+    # MI355X/gfx950 optimization: for small decode sequences where Triton-AITER splitK
+    # overhead dominates the GEMM-efficient SDPA path, dispatch to PyTorch SDPA.
+    # Fallback threshold set at seqlen_k < 4096 for (B=1,H=32,D=128) shapes.
+    if (
+        USE_TRITON_ROCM
+        and k is None
+        and v is None
+        and causal is False
+        and rotary_cos is None
+        and rotary_sin is None
+        and cache_batch_idx is None
+        and cache_leftpad is None
+        and block_table is None
+        and alibi_slopes is None
+        and softcap == 0.0
+        and window_size == (-1, -1)
+        and num_splits in (0, 1)
+    ):
+        # Avoid cache_seqlens.max().item() GPU sync overhead; use k_cache.shape[1]
+        # as the effective sequence length for the non-paged, contiguous-cache case.
+        seqlen_k = k_cache.shape[1]
+        if seqlen_k < 4096:
+            q_t = q.transpose(1, 2)
+            k_t = k_cache.transpose(1, 2)
+            v_t = v_cache.transpose(1, 2)
+            out_t = F.scaled_dot_product_attention(
+                q_t, k_t, v_t, is_causal=False, scale=softmax_scale
+            )
+            out = out_t.transpose(1, 2)
+            if return_softmax_lse:
+                qk = torch.matmul(q_t, k_t.transpose(-2, -1)) * softmax_scale
+                softmax_lse = torch.logsumexp(qk, dim=-1).squeeze(2)
+                return out, softmax_lse
+            return out
+
     out, softmax_lse = flash_attn_gpu.fwd_kvcache(
         q,
         k_cache,
