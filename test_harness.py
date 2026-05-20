@@ -1,66 +1,63 @@
 #!/usr/bin/env python3
-"""Stage0 harness for issue-flash-attention-22.
-
-Runs a small faithful MI355X bf16 no-causal head_dim=128 check. The harness
-prints the required metric name verbatim and exits non-zero if the FA-4 CUTE API
-is absent/unimplemented or exceeds the parity tolerance.
+"""Stage0 FA-4 forward correctness harness for issue-flash-attention-22.
+Runs inside the container against /workspace/flash-attention.
+Prints required metric name verbatim: fa4_forward_correctness_max_abs_diff.
 """
 import json
 import os
 import sys
-import time
-import traceback
+from pathlib import Path
 
 import torch
 
-METRIC = "fa4_forward_correctness_max_abs_diff"
-TOL = 8e-3
+REPO = Path('/workspace/flash-attention')
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
 
-def sdpa_reference(q, k, v):
-    # q/k/v: [B, S, H, D], bf16. SDPA wants [B, H, S, D].
-    qh, kh, vh = [x.transpose(1, 2).contiguous() for x in (q, k, v)]
-    out = torch.nn.functional.scaled_dot_product_attention(qh, kh, vh, is_causal=False)
-    return out.transpose(1, 2).contiguous()
 
-def main():
-    os.environ.setdefault("TMPDIR", "/scratch/tmp")
-    torch.manual_seed(1234)
-    if not torch.cuda.is_available():
-        print(json.dumps({"status": "failed", "reason": "torch.cuda.is_available false"}))
-        return 2
-    dev_name = torch.cuda.get_device_name(0)
-    # Single required acceptance shape: head_dim=128, bf16, causal=False.
-    b, s, h, d = 1, 256, 1, 128
-    q = torch.randn((b, s, h, d), device="cuda", dtype=torch.bfloat16)
-    k = torch.randn((b, s, h, d), device="cuda", dtype=torch.bfloat16)
-    v = torch.randn((b, s, h, d), device="cuda", dtype=torch.bfloat16)
-    ref = sdpa_reference(q, k, v)
-    torch.cuda.synchronize()
-
+def _call_flash_attn(q, k, v):
     try:
         from flash_attn.cute import flash_attn_func
-    except Exception as exc:
-        print(f"{METRIC}: 1e9 max_abs_diff  # import_error {type(exc).__name__}: {exc}")
-        traceback.print_exc()
-        return 3
-
+    except Exception as e:
+        raise RuntimeError(f"failed to import flash_attn.cute.flash_attn_func: {type(e).__name__}: {e}")
     try:
-        t0 = time.perf_counter()
-        out = flash_attn_func(q, k, v, causal=False)
-        torch.cuda.synchronize()
-        elapsed_ms = (time.perf_counter() - t0) * 1000.0
-    except Exception as exc:
-        print(f"{METRIC}: 1e9 max_abs_diff  # runtime_error {type(exc).__name__}: {exc}")
-        traceback.print_exc()
-        return 4
+        return flash_attn_func(q, k, v, causal=False)
+    except TypeError:
+        return flash_attn_func(q, k, v, dropout_p=0.0, causal=False)
 
-    if isinstance(out, tuple):
+
+def main():
+    if not torch.cuda.is_available():
+        raise SystemExit('torch cuda/hip unavailable')
+    torch.manual_seed(1234)
+    device = torch.device('cuda')
+    # Single representative FA forward shape with head_dim 128, bf16, no-causal.
+    batch, seqlen, nheads, headdim = 1, 256, 8, 128
+    q = torch.randn(batch, seqlen, nheads, headdim, device=device, dtype=torch.bfloat16)
+    k = torch.randn(batch, seqlen, nheads, headdim, device=device, dtype=torch.bfloat16)
+    v = torch.randn(batch, seqlen, nheads, headdim, device=device, dtype=torch.bfloat16)
+    torch.cuda.synchronize()
+    out = _call_flash_attn(q, k, v)
+    if isinstance(out, (tuple, list)):
         out = out[0]
+    # Reference math: PyTorch SDPA on same ROCm host, layout B,H,S,D.
+    ref = torch.nn.functional.scaled_dot_product_attention(
+        q.transpose(1, 2), k.transpose(1, 2), v.transpose(1, 2),
+        dropout_p=0.0, is_causal=False,
+    ).transpose(1, 2)
+    torch.cuda.synchronize()
     diff = (out.float() - ref.float()).abs().max().item()
-    print(f"{METRIC}: {diff:.8g} max_abs_diff")
-    print(f"fa4_forward_time_ms: {elapsed_ms:.6f} ms")
-    print(json.dumps({"device": dev_name, "shape": [b, s, h, d], "dtype": "bf16", "causal": False, METRIC: diff, "t_ms": elapsed_ms}))
-    return 0 if diff < TOL else 5
+    print(f"fa4_forward_correctness_max_abs_diff: {diff}")
+    print(json.dumps({
+        'metric_name': 'fa4_forward_correctness_max_abs_diff',
+        'metric_unit': 'max abs diff vs FA-3 port reference (bf16)',
+        'metric_direction': 'lower',
+        'metric_value': diff,
+        'device_name': torch.cuda.get_device_name(0),
+        'hip_visible_devices': os.environ.get('HIP_VISIBLE_DEVICES'),
+    }, sort_keys=True))
+    if diff >= 8e-3:
+        raise SystemExit(f'metric above target: {diff}')
 
-if __name__ == "__main__":
-    sys.exit(main())
+if __name__ == '__main__':
+    main()
