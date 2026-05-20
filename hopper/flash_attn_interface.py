@@ -104,6 +104,50 @@ def _flash_attn_forward(
     ]
     rotary_cos, rotary_sin = [maybe_contiguous(x) for x in (rotary_cos, rotary_sin)]
     seqlens_rotary = maybe_contiguous(seqlens_rotary)
+    # AMD optimized dispatch for FP8 forward inference when AITER mha_fwd is available
+    if (
+        getattr(torch.version, 'hip', None) is not None
+        and q.dtype == torch.float8_e4m3fn
+        and not any(x is not None and x.requires_grad for x in [q, k, v, k_new, v_new, qv])
+        and cu_seqlens_q is None
+        and k_new is None
+        and v_new is None
+        and qv is None
+        and softcap == 0.0
+        and attention_chunk == 0
+        and num_splits == 1
+        and pack_gqa is None
+    ):
+        try:
+            from aiter.ops.mha import mha_fwd as _aiter_mha_fwd
+            out_dtype = torch.bfloat16
+            if out_ is not None and out_.dtype == out_dtype:
+                out = out_
+            else:
+                out = torch.empty(q.shape[0], q.shape[1], q.shape[2], v.shape[-1], dtype=out_dtype, device=q.device)
+            _res = _aiter_mha_fwd(
+                q, k, v,
+                0.0,
+                softmax_scale if softmax_scale is not None else (q.shape[-1] ** -0.5),
+                causal,
+                window_size_left,
+                window_size_right,
+                0,
+                False,
+                False,
+                out=out,
+                q_descale=q_descale,
+                k_descale=k_descale,
+                v_descale=v_descale,
+            )
+            batch_size, seqlen_q, num_heads = q.shape[:3]
+            softmax_lse = torch.zeros(batch_size, num_heads, seqlen_q, dtype=torch.float32, device=q.device)
+            out_accum = torch.tensor([], device=q.device)
+            softmax_lse_accum = torch.tensor([], device=q.device)
+            return out, softmax_lse, out_accum, softmax_lse_accum
+        except Exception:
+            pass
+
     out, softmax_lse, out_accum, softmax_lse_accum = flash_attn_3_gpu.fwd(
         q,
         k,
