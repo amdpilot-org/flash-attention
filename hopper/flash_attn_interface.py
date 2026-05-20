@@ -3,10 +3,16 @@
 from typing import Optional, Union, List, Tuple
 
 import os
+import sys
 import torch
 import torch.nn as nn
 import warnings
 
+# Prefer the repo-bundled aiter (contains AMD-specific tuning fixes) over the
+# system-installed copy so that any third_party/aiter edits are functional.
+_REPO_AITER = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "third_party", "aiter")
+if os.path.isdir(_REPO_AITER):
+    sys.path.insert(0, _REPO_AITER)
 
 USE_TRITON_ROCM = os.getenv("FLASH_ATTENTION_TRITON_AMD_ENABLE", "FALSE") == "TRUE"
 if not USE_TRITON_ROCM and getattr(torch.version, 'hip', None) is not None:
