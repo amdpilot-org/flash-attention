@@ -6,6 +6,7 @@ import os
 import torch
 import torch.nn as nn
 import warnings
+import aiter  # Stage0: known-good gfx950 CK FMHA v3 baseline
 
 
 USE_TRITON_ROCM = os.getenv("FLASH_ATTENTION_TRITON_AMD_ENABLE", "FALSE") == "TRUE"
@@ -93,6 +94,40 @@ def _flash_attn_forward(
     pack_gqa: Optional[bool] = None,
     sm_margin: int = 0,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    # Stage1 gfx950 auto-dispatch: for MI355X (`gfx950`) on the narrow issue #17
+    # target shape (batch=1, head_dim=128, bf16/fp16, non-causal, no window/chunk,
+    # no KV-cache) automatically route to AITER CK FMHA v3.  This avoids the
+    # ~2.6× slower generic Triton-AMD fallback and requires no env-var opt-in.
+    # If the env-var FLASH_ATTENTION_AMD_FA3 is set to "FALSE" the auto-dispatch
+    # can be explicitly overridden; otherwise gfx950 is detected from
+    # gcnArchName and the fast path is taken automatically.
+    try:
+        is_hip = getattr(torch.version, "hip", None) is not None
+        if is_hip:
+            props = torch.cuda.get_device_properties(q.device)
+            is_gfx950 = "gfx950" in getattr(props, "gcnArchName", "")
+            env_flag = os.getenv("FLASH_ATTENTION_AMD_FA3", None)
+            use_ck = (env_flag == "TRUE") or (env_flag is None and is_gfx950)
+            shape_ok = (
+                q.dim() == 4 and k.dim() == 4 and v.dim() == 4
+                and q.shape[0] == 1 and q.shape[-1] == 128
+                and not causal
+                and window_size_left == -1 and window_size_right == -1
+                and attention_chunk == 0
+                and qv is None and k_new is None and v_new is None
+                and cu_seqlens_q is None and cu_seqlens_k is None and cu_seqlens_k_new is None
+                and page_table is None and kv_batch_idx is None and leftpad_k is None
+            )
+            if use_ck and shape_ok:
+                out = aiter.flash_attn_func(
+                    q, k, v, dropout_p=0.0, softmax_scale=softmax_scale, causal=False,
+                    window_size=(-1, -1, 0), deterministic=True, return_lse=False,
+                    return_attn_probs=False, how_v3_bf16_cvt=0)
+                softmax_lse = torch.empty((q.shape[0], q.shape[2], q.shape[1]), device=q.device, dtype=torch.float32)
+                return out, softmax_lse, torch.tensor([], device=q.device), torch.tensor([], device=q.device)
+    except Exception as e:
+        warnings.warn(f"gfx950 AITER CK FMHA v3 auto-dispatch failed, falling back: {e}")
+
     q, k, k_new, v_new = [maybe_contiguous(x) for x in (q, k, k_new, v_new)]
     v = v.contiguous() if v.stride(-1) != 1 and v.stride(-3) != 1 else v
     cu_seqlens_q, cu_seqlens_k, cu_seqlens_k_new = [
