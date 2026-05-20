@@ -9,15 +9,39 @@ import warnings
 
 
 USE_TRITON_ROCM = os.getenv("FLASH_ATTENTION_TRITON_AMD_ENABLE", "FALSE") == "TRUE"
-if not USE_TRITON_ROCM and getattr(torch.version, 'hip', None) is not None:
+
+# Auto-enable Triton ROCm path on AMD MI300/MI350 (gfx9*) GPUs where the CUDA Hopper
+# extension flash_attn_3._C is never present. This avoids a pointless ImportError
+# and makes the code work out-of-the-box on gfx950/942 without the env var.
+_IS_HIP = getattr(torch.version, 'hip', None) is not None
+if _IS_HIP and not USE_TRITON_ROCM:
     try:
-        import flash_attn_3._C
-    except ImportError:
-        warnings.warn("flash_attn_3._C (which has ROCm/HIP kernels) not found, falling back to Triton implementation")
-        USE_TRITON_ROCM = True
+        # gcnArchName is available on ROCm; e.g. gfx950, gfx942
+        _gcn = torch.cuda.get_device_properties(0).gcnArchName
+        if _gcn.startswith("gfx9"):
+            USE_TRITON_ROCM = True
+    except Exception:
+        # If arch detection fails, fall back to the old try-then-fallback logic
+        try:
+            import flash_attn_3._C
+        except ImportError:
+            warnings.warn(
+                "flash_attn_3._C (Hopper CUDA extension) not found on HIP device; "
+                "falling back to Triton implementation. "
+                "Set FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE to suppress this warning."
+            )
+            USE_TRITON_ROCM = True
 
 if USE_TRITON_ROCM:
-    from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_3 as flash_attn_3_gpu
+    try:
+        from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_3 as flash_attn_3_gpu
+    except Exception as e:
+        raise RuntimeError(
+            "flash_attn_interface.py: aiter Triton FA-3 backend failed to import. "
+            f"Error: {e}\n"
+            "Ensure aiter is installed (e.g. `pip show aiter`) and that "
+            "FLASH_ATTENTION_TRITON_AMD_ENABLE is set for ROCm builds."
+        ) from e
 else:
     # isort: off
     # We need to import the CUDA kernels after importing torch
