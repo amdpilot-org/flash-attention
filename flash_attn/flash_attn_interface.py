@@ -17,10 +17,17 @@ if not USE_TRITON_ROCM and getattr(torch.version, 'hip', None) is not None:
         warnings.warn("flash_attn_2_cuda (which has ROCm/HIP kernels) not found, falling back to Triton implementation")
         USE_TRITON_ROCM = True
 
+flash_attn_gpu = None
 if USE_TRITON_ROCM:
-    from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_2 as flash_attn_gpu
+    try:
+        from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_2 as flash_attn_gpu
+    except Exception:
+        pass
 else:
-    import flash_attn_2_cuda as flash_attn_gpu
+    try:
+        import flash_attn_2_cuda as flash_attn_gpu
+    except Exception:
+        pass
 
 # isort: on
 
