@@ -18,7 +18,11 @@ if not USE_TRITON_ROCM and getattr(torch.version, 'hip', None) is not None:
         USE_TRITON_ROCM = True
 
 if USE_TRITON_ROCM:
-    from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_2 as flash_attn_gpu
+    try:
+        from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_2 as flash_attn_gpu
+    except Exception:
+        warnings.warn("aiter Triton AMD flash_attn not available; flash_attn_gpu unavailable")
+        flash_attn_gpu = None
 else:
     import flash_attn_2_cuda as flash_attn_gpu
 
