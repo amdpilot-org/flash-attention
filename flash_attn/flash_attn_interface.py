@@ -1482,6 +1482,36 @@ def flash_attn_varlen_func(
     )
 
 
+def flash_attn_paged_kvcache(
+    q,
+    k_cache,
+    v_cache,
+    block_table=None,
+    cache_seqlens=None,
+    causal=False,
+    schedule=None,
+    max_ctx=None,
+    **kwargs
+):
+    """Paged KV cache attention dispatching to FA-2 or FA-3 based on schedule."""
+    if schedule == "fa3":
+        from aiter.ops.triton.attention.mha_v3 import flash_attn_with_kvcache as _fa3_kv
+        return _fa3_kv(
+            q, k_cache, v_cache,
+            page_table=block_table,
+            cache_seqlens=cache_seqlens,
+            causal=causal,
+            **kwargs,
+        )
+    return flash_attn_with_kvcache(
+        q, k_cache, v_cache,
+        block_table=block_table,
+        cache_seqlens=cache_seqlens,
+        causal=causal,
+        **kwargs,
+    )
+
+
 def flash_attn_with_kvcache(
     q,
     k_cache,
@@ -1502,6 +1532,41 @@ def flash_attn_with_kvcache(
     alibi_slopes=None,
     num_splits=0,
     return_softmax_lse=False,
+):
+    return _flash_attn_with_kvcache_impl(
+        q, k_cache, v_cache, k=k, v=v,
+        rotary_cos=rotary_cos, rotary_sin=rotary_sin,
+        cache_seqlens=cache_seqlens, cache_batch_idx=cache_batch_idx,
+        cache_leftpad=cache_leftpad, block_table=block_table,
+        softmax_scale=softmax_scale, causal=causal,
+        window_size=window_size, softcap=softcap,
+        rotary_interleaved=rotary_interleaved, alibi_slopes=alibi_slopes,
+        num_splits=num_splits, return_softmax_lse=return_softmax_lse,
+    )
+
+
+def _flash_attn_with_kvcache_impl(
+    q,
+    k_cache,
+    v_cache,
+    k=None,
+    v=None,
+    rotary_cos=None,
+    rotary_sin=None,
+    cache_seqlens: Optional[Union[(int, torch.Tensor)]] = None,
+    cache_batch_idx: Optional[torch.Tensor] = None,
+    cache_leftpad: Optional[torch.Tensor] = None,
+    block_table: Optional[torch.Tensor] = None,
+    softmax_scale=None,
+    causal=False,
+    window_size=(-1, -1),
+    softcap=0.0,
+    rotary_interleaved=True,
+    alibi_slopes=None,
+    num_splits=0,
+    return_softmax_lse=False,
+    schedule=None,
+    max_ctx=None,
 ):
     """
     If k and v are not None, k_cache and v_cache will be updated *inplace* with the new values from
