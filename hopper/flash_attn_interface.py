@@ -104,6 +104,8 @@ def _flash_attn_forward(
     ]
     rotary_cos, rotary_sin = [maybe_contiguous(x) for x in (rotary_cos, rotary_sin)]
     seqlens_rotary = maybe_contiguous(seqlens_rotary)
+    if USE_TRITON_ROCM and num_splits != 1:
+        num_splits = 1
     out, softmax_lse, out_accum, softmax_lse_accum = flash_attn_3_gpu.fwd(
         q,
         k,
