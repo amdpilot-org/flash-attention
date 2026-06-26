@@ -10,12 +10,18 @@ import warnings
 # isort: off
 # We need to import the CUDA kernels after importing torch
 USE_TRITON_ROCM = os.getenv("FLASH_ATTENTION_TRITON_AMD_ENABLE", "FALSE") == "TRUE"
+USE_AITER_ROCM = False
 if not USE_TRITON_ROCM and getattr(torch.version, 'hip', None) is not None:
     try:
         import flash_attn_2_cuda
     except ImportError:
         warnings.warn("flash_attn_2_cuda (which has ROCm/HIP kernels) not found, falling back to Triton implementation")
         USE_TRITON_ROCM = True
+    try:
+        from aiter.ops.mha import FlashAttnFunc as _AiterFlashAttnFunc
+        USE_AITER_ROCM = True
+    except Exception:
+        pass
 
 if USE_TRITON_ROCM:
     from aiter.ops.triton._triton_kernels.flash_attn_triton_amd import flash_attn_2 as flash_attn_gpu
@@ -1214,6 +1220,30 @@ def flash_attn_func(
             The output of softmax (possibly with different scaling). It also encodes the dropout
             pattern (negative means that location was dropped, nonnegative means it was kept).
     """
+    if USE_AITER_ROCM and getattr(torch.version, 'hip', None) is not None:
+        try:
+            if softmax_scale is None:
+                softmax_scale = q.shape[-1] ** (-0.5)
+            result = _AiterFlashAttnFunc.apply(
+                q, k, v,
+                dropout_p,
+                softmax_scale,
+                causal,
+                window_size,
+                None,               # bias
+                alibi_slopes,
+                deterministic,
+                True,               # return_lse (required for backward)
+                return_attn_probs and dropout_p > 0,  # return_softmax
+                torch.is_grad_enabled(),
+                True,               # is_v3_atomic_fp32 — validated optimal on MI300X
+                1,                  # how_v3_bf16_cvt=1 (rtna) — fastest within parity tolerance
+            )
+            if not return_attn_probs:
+                return result[0] if isinstance(result, tuple) else result
+            return result
+        except Exception:
+            pass
     return FlashAttnFunc.apply(
         q,
         k,
