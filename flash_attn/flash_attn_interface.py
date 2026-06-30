@@ -81,6 +81,43 @@ else:
     _torch_register_fake_wrapper = noop_register_fake_wrapper
 
 
+def _rocm_fmha_v3_forward(q, k, v, dropout_p, softmax_scale, causal,
+                          window_size_left, window_size_right, softcap,
+                          alibi_slopes, return_softmax):
+    """On ROCm, route the BF16 forward through aiter's prebuilt fmha_v3_fwd
+    (FA-3 style CK kernel, fwd_hd128_bf16_causal) when shape/dtype constraints
+    are satisfied. Returns (out, softmax_lse, S_dmask, rng_state) or None to
+    fall back to the default flash_attn_2_cuda path.
+    """
+    if getattr(torch.version, "hip", None) is None:
+        return None
+    if q.dtype != torch.bfloat16 or k.dtype != torch.bfloat16 or v.dtype != torch.bfloat16:
+        return None
+    if alibi_slopes is not None or dropout_p != 0.0 or softcap != 0.0:
+        return None
+    if window_size_left > 0 or window_size_right > 0:
+        return None
+    if q.ndim != 4:
+        return None
+    hdim_q, hdim_v = q.shape[-1], v.shape[-1]
+    if hdim_v != 128 or hdim_q not in (128, 192):
+        return None
+    if q.shape[2] % k.shape[2] != 0:
+        return None
+    if q.shape[1] <= 128:
+        return None
+    try:
+        from aiter.ops.mha import fmha_v3_fwd
+    except Exception:
+        return None
+    out, softmax_lse, S_dmask, rng_state = fmha_v3_fwd(
+        q, k, v, 0.0, softmax_scale, causal,
+        window_size_left, window_size_right,
+        True, False, 1, None, None, None, None,
+    )
+    return out, softmax_lse, S_dmask, rng_state
+
+
 @_torch_custom_op_wrapper("flash_attn::_flash_attn_forward", mutates_args=(), device_types="cuda")
 def _flash_attn_forward(
     q: torch.Tensor,
@@ -96,6 +133,13 @@ def _flash_attn_forward(
     return_softmax: bool
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     q, k, v = [maybe_contiguous(x) for x in (q, k, v)]
+    v3 = _rocm_fmha_v3_forward(
+        q, k, v, dropout_p, softmax_scale, causal,
+        window_size_left, window_size_right, softcap,
+        alibi_slopes, return_softmax,
+    )
+    if v3 is not None:
+        return v3
     out, softmax_lse, S_dmask, rng_state = flash_attn_gpu.fwd(
         q,
         k,
