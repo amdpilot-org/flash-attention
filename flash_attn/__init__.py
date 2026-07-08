@@ -5,12 +5,18 @@ __path__ = extend_path(__path__, __name__)
 
 __version__ = "2.8.4"
 
-from flash_attn.flash_attn_interface import (
-    flash_attn_func,
-    flash_attn_kvpacked_func,
-    flash_attn_qkvpacked_func,
-    flash_attn_varlen_func,
-    flash_attn_varlen_kvpacked_func,
-    flash_attn_varlen_qkvpacked_func,
-    flash_attn_with_kvcache,
-)
+try:
+    from flash_attn.flash_attn_interface import (
+        flash_attn_func,
+        flash_attn_kvpacked_func,
+        flash_attn_qkvpacked_func,
+        flash_attn_varlen_func,
+        flash_attn_varlen_kvpacked_func,
+        flash_attn_varlen_qkvpacked_func,
+        flash_attn_with_kvcache,
+    )
+except Exception:
+    # The FA-2 backend (flash_attn_2_cuda HIP kernel, or its aiter Triton
+    # fallback) may be unavailable on this platform. Keep the top-level package
+    # importable so that flash_attn.cute (FA-4) still works.
+    pass
