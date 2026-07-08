@@ -280,6 +280,13 @@ def _flash_attn_backward(
     deterministic: bool = False,
     sm_margin: int = 0,
 ) -> torch.Tensor:
+    # When FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE, the backward dispatches to
+    # the AMD Triton backend (aiter flash_attn_triton_amd). On gfx950 (MI355X)
+    # the Triton backward kernel uses fp16 dot-product inputs for softmax
+    # probabilities (pT) and ds/dsT intermediates, which are computed in fp32
+    # but cast to fp16 (10 mantissa bits) instead of bf16 (7 mantissa bits)
+    # before the tl.dot calls. This halves the max-abs-diff vs the fp32 eager
+    # reference (from ~2^-8 to ~2^-9) without sacrificing tensor-core throughput.
     # dq, dk, dv are allocated by us so they should already be contiguous
     dout, q, k, v, out = [maybe_contiguous(x) for x in (dout, q, k, v, out)]
     softmax_d, *rest = flash_attn_3_gpu.bwd(
